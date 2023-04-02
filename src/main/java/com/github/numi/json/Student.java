@@ -15,7 +15,17 @@ public class Student {
     private Boolean hasChildren;
     private Integer scholarship;
 
-    public Student(Long id, String firstname, String lastname, String patronymic, LocalDate dateOfBirth, Gender gender, Boolean hasChildren, Integer scholarship) {
+    private Long groupId;
+
+    public Student(Long id,
+                   String firstname,
+                   String lastname,
+                   String patronymic,
+                   LocalDate dateOfBirth,
+                   Gender gender,
+                   Boolean hasChildren,
+                   Integer scholarship,
+                   Long groupId) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -24,6 +34,7 @@ public class Student {
         this.gender = gender;
         this.hasChildren = hasChildren;
         this.scholarship = scholarship;
+        this.groupId = groupId;
     }
 
     public Student(StudentEntity entity) {
@@ -35,6 +46,7 @@ public class Student {
         this.gender = entity.getGender();
         this.hasChildren = entity.getHasChildren();
         this.scholarship = entity.getScholarship();
+        this.groupId = entity.getGroup().getId();
     }
 
     public Long getId() {
@@ -67,5 +79,9 @@ public class Student {
 
     public Integer getScholarship() {
         return scholarship;
+    }
+
+    public Long getGroupId() {
+        return groupId;
     }
 }

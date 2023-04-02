@@ -1,12 +1,11 @@
 package com.github.numi.entities;
 
 import com.github.numi.enums.Gender;
+import com.github.numi.json.Group;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 public class StudentEntity {
@@ -21,6 +20,9 @@ public class StudentEntity {
     private Boolean hasChildren;
     private Integer scholarship;
 
+    @ManyToOne
+    @JoinColumn(name="group_id", nullable = false)
+    private GroupEntity group;
     protected StudentEntity() {}
     public StudentEntity(String firstname,
                             String lastname,
@@ -28,7 +30,8 @@ public class StudentEntity {
                             LocalDate dateOfBirth,
                             Gender gender,
                             Boolean hasChildren,
-                            Integer scholarship) {
+                            Integer scholarship,
+                            GroupEntity group) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.patronymic = patronymic;
@@ -36,6 +39,7 @@ public class StudentEntity {
         this.gender = gender;
         this.hasChildren = hasChildren;
         this.scholarship = scholarship;
+        this.group = group;
     }
 
     public Long getId() {
@@ -96,5 +100,13 @@ public class StudentEntity {
 
     public void setScholarship(Integer scholarship) {
         this.scholarship = scholarship;
+    }
+
+    public GroupEntity getGroup() {
+        return group;
+    }
+
+    public void setGroup(GroupEntity group) {
+        this.group = group;
     }
 }
