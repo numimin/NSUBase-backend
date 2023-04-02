@@ -6,6 +6,7 @@ import com.github.numi.enums.Gender;
 import java.time.LocalDate;
 
 public class Student {
+    private Long id;
     private String firstname;
     private String lastname;
     private String patronymic;
@@ -14,7 +15,8 @@ public class Student {
     private Boolean hasChildren;
     private Integer scholarship;
 
-    public Student(String firstname, String lastname, String patronymic, LocalDate dateOfBirth, Gender gender, Boolean hasChildren, Integer scholarship) {
+    public Student(Long id, String firstname, String lastname, String patronymic, LocalDate dateOfBirth, Gender gender, Boolean hasChildren, Integer scholarship) {
+        this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
         this.patronymic = patronymic;
@@ -25,6 +27,7 @@ public class Student {
     }
 
     public Student(StudentEntity entity) {
+        this.id = entity.getId();
         this.firstname = entity.getFirstname();
         this.lastname = entity.getLastname();
         this.patronymic = entity.getPatronymic();
@@ -32,6 +35,10 @@ public class Student {
         this.gender = entity.getGender();
         this.hasChildren = entity.getHasChildren();
         this.scholarship = entity.getScholarship();
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getFirstname() {

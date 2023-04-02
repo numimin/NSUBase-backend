@@ -38,6 +38,10 @@ public class StudentEntity {
         this.scholarship = scholarship;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getFirstname() {
         return firstname;
     }
