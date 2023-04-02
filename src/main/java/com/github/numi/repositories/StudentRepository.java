@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface StudentRepository extends CrudRepository<StudentEntity, Long> {
-    @Query("SELECT s FROM StudentEntity s WHERE :gender = s.gender AND :year = YEAR(s.dateOfBirth) AND :age = DATEDIFF(YEAR, s.dateOfBirth, CURRENT_DATE()) AND :hasChildren = s.hasChildren AND :minScholarship <= s.scholarship AND s.scholarship <= :maxScholarship")
+    @Query("SELECT s FROM StudentEntity s WHERE (:gender IS NULL OR :gender = s.gender) AND (:year IS NULL OR :year = YEAR(s.dateOfBirth)) AND (:age IS NULL OR :age = DATEDIFF(YEAR, s.dateOfBirth, CURRENT_DATE())) AND (:hasChildren IS NULL OR :hasChildren = s.hasChildren) AND (:minScholarship IS NULL OR :minScholarship <= s.scholarship) AND (:maxScholarship IS NULL OR s.scholarship <= :maxScholarship)")
     List<StudentEntity> findStudent(@Param("gender") Gender gender,
                                     @Param("year")Integer year,
                                     @Param("age")Integer age,

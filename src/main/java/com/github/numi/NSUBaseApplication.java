@@ -34,13 +34,13 @@ public class NSUBaseApplication {
         ));
     }
 
-    @GetMapping("/api/student")
-    public List<Student> students(@RequestParam Gender gender,
-                                  @RequestParam Integer year,
-                                  @RequestParam Integer age,
-                                  @RequestParam Boolean hasChildren,
-                                  @RequestParam Integer minScholarship,
-                                  @RequestParam Integer maxScholarship) {
+    @GetMapping("/api/students")
+    public List<Student> students(@RequestParam(required = false) Gender gender,
+                                  @RequestParam(required = false) Integer year,
+                                  @RequestParam(required = false) Integer age,
+                                  @RequestParam(required = false) Boolean hasChildren,
+                                  @RequestParam(required = false) Integer minScholarship,
+                                  @RequestParam(required = false) Integer maxScholarship) {
         List<StudentEntity> entities = studentRepository.findStudent(gender,
                 year, age, hasChildren, minScholarship, maxScholarship);
         if (entities == null) return new ArrayList<>();
