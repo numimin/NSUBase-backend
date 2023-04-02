@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 @RestController
@@ -33,9 +35,15 @@ public class NSUBaseApplication {
     }
 
     @GetMapping("/api/student")
-    public Student studentByFirstname(@RequestParam String firstname) {
-        StudentEntity entity = studentRepository.findByFirstname(firstname);
-        if (entity == null) return null;
-        return new Student(entity);
+    public List<Student> students(@RequestParam Gender gender,
+                                  @RequestParam Integer year,
+                                  @RequestParam Integer age,
+                                  @RequestParam Boolean hasChildren,
+                                  @RequestParam Integer minScholarship,
+                                  @RequestParam Integer maxScholarship) {
+        List<StudentEntity> entities = studentRepository.findStudent(gender,
+                year, age, hasChildren, minScholarship, maxScholarship);
+        if (entities == null) return new ArrayList<>();
+        return entities.stream().map(Student::new).toList();
     }
 }
