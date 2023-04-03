@@ -274,11 +274,52 @@ public class NSUBaseApplication {
             end = convertDate(query.getEnd());
         }
 
-        return lessonRepository.findByGroup(groupEntity, course, facultyEntity, term,
+        return lessonRepository.findByGroup(groupEntity, course, facultyEntity, null, term,
                         start, end).stream()
                 .map(LessonEntity::getTeacher)
                 .map(TeacherEntity::getDepartment)
                 .map(Department::new)
+                .collect(Collectors.toSet());
+    }
+
+    @GetMapping("/api/lessons")
+    public Set<Lesson> lessons(@RequestParam(required = false) Long groupId) {
+        GroupEntity groupEntity = null;
+        if (groupId != null) {
+            groupEntity = groupRepository.findById(groupId).orElse(null);
+            if (groupEntity == null) {
+                return new HashSet<>();
+            }
+        }
+        return lessonRepository.findByGroup(groupEntity).stream()
+                .map(Lesson::new)
+                .collect(Collectors.toSet());
+    }
+
+    @GetMapping("/api/teacher_lessons")
+    public Set<Teacher> teacherLessons(@RequestParam(required = false) Long groupId,
+                                          @RequestParam(required = false) Long lessonId,
+                                             @RequestParam(required = false) Long facultyId,
+                                             @RequestParam(required = false) Integer course) {
+        GroupEntity groupEntity = null;
+        if (groupId != null) {
+            groupEntity = groupRepository.findById(groupId).orElse(null);
+            if (groupEntity == null) {
+                return new HashSet<>();
+            }
+        }
+        FacultyEntity facultyEntity = null;
+        if (facultyId != null) {
+            facultyEntity = facultyRepository.findById(facultyId).orElse(null);
+            if (facultyEntity == null) {
+                return new HashSet<>();
+            }
+        }
+
+        return lessonRepository.findByGroup(groupEntity, course, facultyEntity, lessonId,
+                        null, null, null).stream()
+                .map(LessonEntity::getTeacher)
+                .map(Teacher::new)
                 .collect(Collectors.toSet());
     }
 }

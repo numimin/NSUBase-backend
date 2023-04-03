@@ -5,6 +5,7 @@ import com.github.numi.teachers.entities.TeacherEntity;
 import com.github.numi.teachers.enums.Category;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Teacher {
     private Long id;
@@ -99,6 +100,19 @@ public class Teacher {
 
     public String getPatronymic() {
         return patronymic;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Teacher teacher = (Teacher) o;
+        return Objects.equals(id, teacher.id) && Objects.equals(firstname, teacher.firstname) && Objects.equals(lastname, teacher.lastname) && Objects.equals(patronymic, teacher.patronymic) && category == teacher.category && gender == teacher.gender && Objects.equals(hasChildren, teacher.hasChildren) && Objects.equals(salary, teacher.salary) && Objects.equals(graduateStudent, teacher.graduateStudent) && Objects.equals(phdThesisDate, teacher.phdThesisDate) && Objects.equals(departmentId, teacher.departmentId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, firstname, lastname, patronymic, category, gender, hasChildren, salary, graduateStudent, phdThesisDate, departmentId);
     }
 }
 
