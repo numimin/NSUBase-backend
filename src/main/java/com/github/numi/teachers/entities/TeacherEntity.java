@@ -24,6 +24,9 @@ public class TeacherEntity {
     @JoinColumn(name="department_id", nullable = false)
     private DepartmentEntity department;
 
+    private String phdDissertation;
+    private String doctoralDissertation;
+
     public TeacherEntity(String firstname,
                          String lastname,
                          String patronymic,
@@ -33,7 +36,9 @@ public class TeacherEntity {
                          Integer salary,
                          Boolean graduateStudent,
                          LocalDate phdThesisDate,
-                         DepartmentEntity department) {
+                         DepartmentEntity department,
+                         String phdDissertation,
+                         String doctoralDissertation) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.patronymic = patronymic;
@@ -44,6 +49,8 @@ public class TeacherEntity {
         this.graduateStudent = graduateStudent;
         this.phdThesisDate = phdThesisDate;
         this.department = department;
+        this.phdDissertation = phdDissertation;
+        this.doctoralDissertation = doctoralDissertation;
     }
 
     protected TeacherEntity() {}
@@ -134,5 +141,21 @@ public class TeacherEntity {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getPhdDissertation() {
+        return phdDissertation;
+    }
+
+    public void setPhdDissertation(String phdDissertation) {
+        this.phdDissertation = phdDissertation;
+    }
+
+    public String getDoctoralDissertation() {
+        return doctoralDissertation;
+    }
+
+    public void setDoctoralDissertation(String doctoralDissertation) {
+        this.doctoralDissertation = doctoralDissertation;
     }
 }

@@ -11,10 +11,7 @@ import com.github.numi.students.repositories.StudentRepository;
 import com.github.numi.teachers.entities.DepartmentEntity;
 import com.github.numi.teachers.entities.TeacherEntity;
 import com.github.numi.teachers.enums.Category;
-import com.github.numi.teachers.json.Department;
-import com.github.numi.teachers.json.DepartmentsQuery;
-import com.github.numi.teachers.json.Teacher;
-import com.github.numi.teachers.json.TeachersQuery;
+import com.github.numi.teachers.json.*;
 import com.github.numi.teachers.repositories.DepartmentRepository;
 import com.github.numi.teachers.repositories.TeacherRepository;
 import com.github.numi.utils.DateStruct;
@@ -27,6 +24,7 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 @RestController
@@ -36,7 +34,6 @@ public class NSUBaseApplication {
     private final FacultyRepository facultyRepository;
     private final TeacherRepository teacherRepository;
     private final DepartmentRepository departmentRepository;
-
     public static void main(String[] args) {
         SpringApplication.run(com.github.numi.NSUBaseApplication.class, args);
     }
@@ -79,7 +76,8 @@ public class NSUBaseApplication {
 
         teacherRepository.save(new TeacherEntity("Александр", "Кугаевских", "",
                 Category.ASSISTANT_PROFESSOR, Gender.MALE, false, 50000,
-                false, LocalDate.of(2013, 12, 5), kt));
+                false, LocalDate.of(2013, 12, 5), kt,
+                "Теория поля", null));
     }
 
     private static <T, U, R> Set<R> retrieveAll(List<Optional<T>> lhs, List<Optional<U>> rhs, BiFunction<T, U, Set<R>> function) {
@@ -216,5 +214,21 @@ public class NSUBaseApplication {
                         department, faculty));
         if (entities == null) return new ArrayList<>();
         return entities.stream().map(Teacher::new).toList();
+    }
+
+    @PostMapping("/api/dissertations")
+    public List<String> dissertations(@RequestBody DissertationsQuery query) {
+        Set<TeacherEntity> entities = retrieveAll(Arrays.stream(query.getFaculties())
+                        .map(facultyRepository::findById)
+                        .toList(),
+                Arrays.stream(query.getDepartments())
+                        .map(departmentRepository::findById)
+                        .toList(),
+                (faculty, department) -> teacherRepository
+                        .findTeachersByAffinity(department, faculty));
+        if (entities == null) return new ArrayList<>();
+        return Stream.concat(entities.stream().map(TeacherEntity::getDoctoralDissertation),
+                         entities.stream().map(TeacherEntity::getPhdDissertation))
+                .toList();
     }
 }

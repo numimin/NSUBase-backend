@@ -37,4 +37,9 @@ public interface TeacherRepository extends CrudRepository<TeacherEntity, Long> {
                                     @Param("phdThesisEndDate") LocalDate phdThesisEndDate,
                                     @Param("department") DepartmentEntity department,
                                     @Param("faculty")FacultyEntity faculty);
+    @Query("SELECT t FROM TeacherEntity t WHERE" +
+            "(:department IS NULL OR :department = t.department) AND" +
+            "(:faculty IS NULL OR :faculty = t.department.faculty)")
+    Set<TeacherEntity> findTeachersByAffinity(@Param("department") DepartmentEntity department,
+                                              @Param("faculty")FacultyEntity faculty);
 }
