@@ -1,6 +1,7 @@
 package com.github.numi.students.entities;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
@@ -9,6 +10,8 @@ public class GroupEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
+
+    private LocalDate date;
 
     @OneToMany(mappedBy = "group")
     private Set<StudentEntity> students;
@@ -19,8 +22,9 @@ public class GroupEntity {
 
     protected GroupEntity() {}
 
-    public GroupEntity(String name, FacultyEntity faculty) {
+    public GroupEntity(String name, LocalDate date, FacultyEntity faculty) {
         this.name = name;
+        this.date = date;
         this.faculty = faculty;
     }
 
@@ -42,5 +46,13 @@ public class GroupEntity {
 
     public void setFaculty(FacultyEntity faculty) {
         this.faculty = faculty;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 }

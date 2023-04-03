@@ -9,10 +9,12 @@ import com.github.numi.students.repositories.FacultyRepository;
 import com.github.numi.students.repositories.GroupRepository;
 import com.github.numi.students.repositories.StudentRepository;
 import com.github.numi.teachers.entities.DepartmentEntity;
+import com.github.numi.teachers.entities.LessonEntity;
 import com.github.numi.teachers.entities.TeacherEntity;
 import com.github.numi.teachers.enums.Category;
 import com.github.numi.teachers.json.*;
 import com.github.numi.teachers.repositories.DepartmentRepository;
+import com.github.numi.teachers.repositories.LessonRepository;
 import com.github.numi.teachers.repositories.TeacherRepository;
 import com.github.numi.utils.DateStruct;
 import org.springframework.boot.SpringApplication;
@@ -24,6 +26,7 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
@@ -34,6 +37,7 @@ public class NSUBaseApplication {
     private final FacultyRepository facultyRepository;
     private final TeacherRepository teacherRepository;
     private final DepartmentRepository departmentRepository;
+    private final LessonRepository lessonRepository;
     public static void main(String[] args) {
         SpringApplication.run(com.github.numi.NSUBaseApplication.class, args);
     }
@@ -42,23 +46,25 @@ public class NSUBaseApplication {
                               GroupRepository groupRepository,
                               FacultyRepository facultyRepository,
                               TeacherRepository teacherRepository,
-                              DepartmentRepository departmentRepository) {
+                              DepartmentRepository departmentRepository,
+                              LessonRepository lessonRepository) {
         this.studentRepository = studentRepository;
         this.groupRepository = groupRepository;
         this.facultyRepository = facultyRepository;
         this.teacherRepository = teacherRepository;
         this.departmentRepository = departmentRepository;
+        this.lessonRepository = lessonRepository;
 
         FacultyEntity fen = new FacultyEntity("ФЕН");
         facultyRepository.save(fen);
         FacultyEntity fit = new FacultyEntity("ФИТ");
         facultyRepository.save(fit);
 
-        GroupEntity group20201 = new GroupEntity("20201", fit);
+        GroupEntity group20201 = new GroupEntity("20201", LocalDate.of(2020, 8, 31), fit);
         groupRepository.save(group20201);
-        GroupEntity group20202 = new GroupEntity("20202", fit);
+        GroupEntity group20202 = new GroupEntity("20202", LocalDate.of(2020, 8, 31), fit);
         groupRepository.save(group20202);
-        GroupEntity group22404_1 = new GroupEntity("22404.1", fen);
+        GroupEntity group22404_1 = new GroupEntity("22404.1", LocalDate.of(2022, 8, 31), fen);
         groupRepository.save(group22404_1);
 
         studentRepository.save(new StudentEntity(
@@ -74,10 +80,18 @@ public class NSUBaseApplication {
         DepartmentEntity kt = new DepartmentEntity("КТ", fit);
         departmentRepository.save(kt);
 
-        teacherRepository.save(new TeacherEntity("Александр", "Кугаевских", "",
+        TeacherEntity kugaevskikh = new TeacherEntity("Александр", "Кугаевских", "",
                 Category.ASSISTANT_PROFESSOR, Gender.MALE, false, 50000,
                 false, LocalDate.of(2013, 12, 5), kt,
-                "Теория поля", null));
+                "Теория поля", null);
+        teacherRepository.save(kugaevskikh);
+
+        LessonEntity tpns20201 = new LessonEntity("Теория и Практика Нейронных Сетей",
+                kugaevskikh, group20201, 6, 3);
+        lessonRepository.save(tpns20201);
+        LessonEntity tpns20202 = new LessonEntity("Теория и Практика Нейронных Сетей",
+                kugaevskikh, group20202, 6, 3);
+        lessonRepository.save(tpns20202);
     }
 
     private static <T, U, R> Set<R> retrieveAll(List<Optional<T>> lhs, List<Optional<U>> rhs, BiFunction<T, U, Set<R>> function) {
@@ -230,5 +244,41 @@ public class NSUBaseApplication {
         return Stream.concat(entities.stream().map(TeacherEntity::getDoctoralDissertation),
                          entities.stream().map(TeacherEntity::getPhdDissertation))
                 .toList();
+    }
+
+    @PostMapping("/api/department_lessons")
+    public Set<Department> departmentLessons(@RequestParam(required = false) Long groupId,
+                                              @RequestParam(required = false) Integer course,
+                                             @RequestParam(required = false) Long facultyId,
+                                             @RequestParam(required = false) Integer term,
+                                             @RequestBody(required = false) DepartmentLessonsQuery query) {
+        GroupEntity groupEntity = null;
+        if (groupId != null) {
+            groupEntity = groupRepository.findById(groupId).orElse(null);
+            if (groupEntity == null) {
+                return new HashSet<>();
+            }
+        }
+        FacultyEntity facultyEntity = null;
+        if (facultyId != null) {
+            facultyEntity = facultyRepository.findById(facultyId).orElse(null);
+            if (facultyEntity == null) {
+                return new HashSet<>();
+            }
+        }
+
+        LocalDate start = null;
+        LocalDate end = null;
+        if (query != null) {
+            start = convertDate(query.getStart());
+            end = convertDate(query.getEnd());
+        }
+
+        return lessonRepository.findByGroup(groupEntity, course, facultyEntity, term,
+                        start, end).stream()
+                .map(LessonEntity::getTeacher)
+                .map(TeacherEntity::getDepartment)
+                .map(Department::new)
+                .collect(Collectors.toSet());
     }
 }

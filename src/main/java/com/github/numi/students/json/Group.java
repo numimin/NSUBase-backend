@@ -19,6 +19,8 @@ public class Group {
         this.facultyId = entity.getFaculty().getId();
     }
 
+    public Group() {}
+
     public Long getId() {
         return id;
     }
