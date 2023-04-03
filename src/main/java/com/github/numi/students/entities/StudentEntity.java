@@ -1,11 +1,9 @@
-package com.github.numi.entities;
+package com.github.numi.students.entities;
 
-import com.github.numi.enums.Gender;
-import com.github.numi.json.Group;
+import com.github.numi.students.enums.Gender;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Set;
 
 @Entity
 public class StudentEntity {

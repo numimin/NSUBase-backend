@@ -1,4 +1,6 @@
-package com.github.numi.entities;
+package com.github.numi.students.entities;
+
+import com.github.numi.teachers.entities.DepartmentEntity;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -12,6 +14,9 @@ public class FacultyEntity {
 
     @OneToMany(mappedBy = "faculty")
     private Set<GroupEntity> groups;
+
+    @OneToMany(mappedBy = "faculty")
+    private Set<DepartmentEntity> departments;
 
     protected FacultyEntity() {}
 
@@ -37,5 +42,17 @@ public class FacultyEntity {
 
     public void setGroups(Set<GroupEntity> groups) {
         this.groups = groups;
+    }
+
+    public Set<DepartmentEntity> getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(Set<DepartmentEntity> departments) {
+        this.departments = departments;
+    }
+
+    public Set<GroupEntity> getGroups() {
+        return groups;
     }
 }

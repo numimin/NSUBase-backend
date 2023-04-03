@@ -1,6 +1,6 @@
-package com.github.numi.repositories;
+package com.github.numi.students.repositories;
 
-import com.github.numi.entities.FacultyEntity;
+import com.github.numi.students.entities.FacultyEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 

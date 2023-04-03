@@ -1,31 +1,38 @@
-package com.github.numi.entities;
+package com.github.numi.teachers.entities;
+
+import com.github.numi.students.entities.FacultyEntity;
+import com.github.numi.students.entities.GroupEntity;
+import com.github.numi.students.entities.StudentEntity;
 
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-public class GroupEntity {
+public class DepartmentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
-
-    @OneToMany(mappedBy = "group")
-    private Set<StudentEntity> students;
-
     @ManyToOne
     @JoinColumn(name="faculty_id", nullable = false)
     private FacultyEntity faculty;
 
-    protected GroupEntity() {}
+    @OneToMany(mappedBy = "department")
+    private Set<TeacherEntity> teachers;
 
-    public GroupEntity(String name, FacultyEntity faculty) {
+    protected DepartmentEntity() {}
+
+    public DepartmentEntity(String name, FacultyEntity faculty) {
         this.name = name;
         this.faculty = faculty;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -42,5 +49,13 @@ public class GroupEntity {
 
     public void setFaculty(FacultyEntity faculty) {
         this.faculty = faculty;
+    }
+
+    public Set<TeacherEntity> getTeachers() {
+        return teachers;
+    }
+
+    public void setTeachers(Set<TeacherEntity> teachers) {
+        this.teachers = teachers;
     }
 }

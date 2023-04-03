@@ -1,7 +1,7 @@
-package com.github.numi.json;
+package com.github.numi.students.json;
 
-import com.github.numi.entities.StudentEntity;
-import com.github.numi.enums.Gender;
+import com.github.numi.students.entities.StudentEntity;
+import com.github.numi.students.enums.Gender;
 
 import java.time.LocalDate;
 

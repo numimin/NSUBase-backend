@@ -1,4 +1,4 @@
-package com.github.numi.json;
+package com.github.numi.students.json;
 
 public class GroupQuery {
     private Long[] faculties;

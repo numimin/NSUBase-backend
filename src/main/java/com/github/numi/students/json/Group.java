@@ -1,6 +1,6 @@
-package com.github.numi.json;
+package com.github.numi.students.json;
 
-import com.github.numi.entities.GroupEntity;
+import com.github.numi.students.entities.GroupEntity;
 
 public class Group {
     private Long id;

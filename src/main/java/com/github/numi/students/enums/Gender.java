@@ -1,4 +1,4 @@
-package com.github.numi.enums;
+package com.github.numi.students.enums;
 
 public enum Gender {
     MALE,

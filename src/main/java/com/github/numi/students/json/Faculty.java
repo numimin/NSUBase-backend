@@ -1,6 +1,6 @@
-package com.github.numi.json;
+package com.github.numi.students.json;
 
-import com.github.numi.entities.FacultyEntity;
+import com.github.numi.students.entities.FacultyEntity;
 
 public class Faculty {
     private Long id;
