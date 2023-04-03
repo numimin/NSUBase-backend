@@ -13,4 +13,18 @@ public class DateStruct {
         month = date.getMonthValue();
         day = date.getDayOfMonth();
     }
+
+    public DateStruct() {}
+
+    public void setDay(int day) {
+        this.day = day;
+    }
+
+    public void setMonth(int month) {
+        this.month = month;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
 }

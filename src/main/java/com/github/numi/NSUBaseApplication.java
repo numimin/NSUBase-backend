@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -187,7 +188,12 @@ public class NSUBaseApplication {
     }
 
     private static LocalDate convertDate(DateStruct dateStruct) {
-        return LocalDate.of(dateStruct.year, dateStruct.month, dateStruct.day);
+        if (dateStruct.year < 0 || dateStruct.month < 0 || dateStruct.day < 0) return null;
+        try {
+            return LocalDate.of(dateStruct.year, dateStruct.month, dateStruct.day);
+        } catch (DateTimeException e) {
+            return null;
+        }
     }
     @PostMapping("/api/teachers")
     public List<Teacher> teachers(@RequestParam(required = false) Category category,
