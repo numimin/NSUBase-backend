@@ -130,6 +130,8 @@ public class NSUBaseApplication {
                                   @RequestParam(required = false) Integer minScholarship,
                                   @RequestParam(required = false) Integer maxScholarship,
                                   @RequestBody() StudentsQuery query) {
+        final LocalDate end = age == null ? null : LocalDate.now().minusYears(age);
+
         Set<StudentEntity> entities = retrieveAll(
                 query.getGroups() == null ? null : Arrays.stream(query.getGroups())
                         .map(groupRepository::findById)
@@ -138,7 +140,7 @@ public class NSUBaseApplication {
                         .map(facultyRepository::findById)
                         .toList(),
                 (group, faculty) -> studentRepository.findStudent(
-                        gender, year, age, hasChildren,
+                        gender, year, end, hasChildren,
                         minScholarship, maxScholarship,
                         group, faculty));
 
@@ -269,10 +271,20 @@ public class NSUBaseApplication {
 
         LocalDate start = null;
         LocalDate end = null;
-        if (query != null) {
+        if (query != null && term != null) {
             start = convertDate(query.getStart());
             end = convertDate(query.getEnd());
         }
+
+        if (start != null && end != null) {
+            start = start.minusYears(term / 2)
+                    .minusMonths(term % 2 == 0 ? 5 : 0);
+            end = end.minusYears(term / 2)
+                    .minusMonths(term % 2 == 0 ? 5 : 0);
+        }
+
+        System.out.println(start != null ? start.getYear() : null);
+        System.out.println(end != null ? end.getYear() : null);
 
         return lessonRepository.findByGroup(groupEntity, course, facultyEntity, null, term,
                         start, end).stream()

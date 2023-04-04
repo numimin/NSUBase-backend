@@ -12,6 +12,7 @@ public class GroupEntity {
     private String name;
 
     private LocalDate date;
+    private LocalDate end_;
 
     @OneToMany(mappedBy = "group")
     private Set<StudentEntity> students;
@@ -26,6 +27,7 @@ public class GroupEntity {
         this.name = name;
         this.date = date;
         this.faculty = faculty;
+        this.end_ = date.plusMonths(5);
     }
 
     public Long getId() {
@@ -54,5 +56,13 @@ public class GroupEntity {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public LocalDate getEnd_() {
+        return end_;
+    }
+
+    public void setEnd_(LocalDate end) {
+        this.end_ = end;
     }
 }

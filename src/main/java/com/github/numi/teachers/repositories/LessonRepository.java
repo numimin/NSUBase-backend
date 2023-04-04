@@ -16,7 +16,7 @@ public interface LessonRepository extends CrudRepository<LessonEntity, Long> {
             "(:faculty IS NULL OR :faculty = l.group.faculty) AND " +
             "(:lessonId IS NULL OR :lessonId = l.id) AND " +
             "(:term IS NULL OR :term = l.term) AND " +
-            "(:start IS NULL OR :end IS NULL OR l.group.date BETWEEN :start AND :end)"
+            "(:start IS NULL OR :end IS NULL OR NOT (l.group.end_ < :start OR :end < l.group.date))"
     )
     Set<LessonEntity> findByGroup(@Param("group") GroupEntity group,
                                   @Param("course") Integer course,
