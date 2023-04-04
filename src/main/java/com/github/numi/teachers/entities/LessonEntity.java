@@ -1,6 +1,7 @@
 package com.github.numi.teachers.entities;
 
 import com.github.numi.students.entities.GroupEntity;
+import com.github.numi.teachers.enums.LessonType;
 
 import javax.persistence.*;
 
@@ -20,16 +21,20 @@ public class LessonEntity {
     private Integer term;
     private Integer course;
 
+    private LessonType type;
+
     public LessonEntity(String name,
                         TeacherEntity teacher,
                         GroupEntity group,
                         Integer term,
-                        Integer course) {
+                        Integer course,
+                        LessonType type) {
         this.name = name;
         this.teacher = teacher;
         this.group = group;
         this.term = term;
         this.course = course;
+        this.type = type;
     }
 
     protected LessonEntity() {}
@@ -80,5 +85,13 @@ public class LessonEntity {
 
     public void setCourse(Integer course) {
         this.course = course;
+    }
+
+    public LessonType getType() {
+        return type;
+    }
+
+    public void setType(LessonType type) {
+        this.type = type;
     }
 }

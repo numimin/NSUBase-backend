@@ -1,6 +1,7 @@
 package com.github.numi.teachers.json;
 
 import com.github.numi.teachers.entities.LessonEntity;
+import com.github.numi.teachers.enums.LessonType;
 
 import java.util.Objects;
 
@@ -11,14 +12,16 @@ public class Lesson {
     private Long groupId;
     private Integer term;
     private Integer course;
+    private LessonType type;
 
-    public Lesson(Long id, String name, Long teacherId, Long groupId, Integer term, Integer course) {
+    public Lesson(Long id, String name, Long teacherId, Long groupId, Integer term, Integer course, LessonType type) {
         this.id = id;
         this.name = name;
         this.teacherId = teacherId;
         this.groupId = groupId;
         this.term = term;
         this.course = course;
+        this.type = type;
     }
 
     public Lesson(LessonEntity entity) {
@@ -28,6 +31,7 @@ public class Lesson {
         groupId = entity.getGroup().getId();
         term = entity.getTerm();
         course = entity.getCourse();
+        type = entity.getType();
     }
 
     public Lesson() {}
@@ -91,5 +95,13 @@ public class Lesson {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, teacherId, groupId, term, course);
+    }
+
+    public LessonType getType() {
+        return type;
+    }
+
+    public void setType(LessonType type) {
+        this.type = type;
     }
 }

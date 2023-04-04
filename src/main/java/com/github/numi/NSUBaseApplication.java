@@ -12,6 +12,7 @@ import com.github.numi.teachers.entities.DepartmentEntity;
 import com.github.numi.teachers.entities.LessonEntity;
 import com.github.numi.teachers.entities.TeacherEntity;
 import com.github.numi.teachers.enums.Category;
+import com.github.numi.teachers.enums.LessonType;
 import com.github.numi.teachers.json.*;
 import com.github.numi.teachers.repositories.DepartmentRepository;
 import com.github.numi.teachers.repositories.LessonRepository;
@@ -87,10 +88,10 @@ public class NSUBaseApplication {
         teacherRepository.save(kugaevskikh);
 
         LessonEntity tpns20201 = new LessonEntity("Теория и Практика Нейронных Сетей",
-                kugaevskikh, group20201, 6, 3);
+                kugaevskikh, group20201, 6, 3, LessonType.LECTURE);
         lessonRepository.save(tpns20201);
         LessonEntity tpns20202 = new LessonEntity("Теория и Практика Нейронных Сетей",
-                kugaevskikh, group20202, 6, 3);
+                kugaevskikh, group20202, 6, 3, LessonType.PRACTICE);
         lessonRepository.save(tpns20202);
     }
 
@@ -328,6 +329,48 @@ public class NSUBaseApplication {
 
         return lessonRepository.findByGroup(groupEntity, course, facultyEntity, lessonId,
                         null, null, null).stream()
+                .map(LessonEntity::getTeacher)
+                .map(Teacher::new)
+                .collect(Collectors.toSet());
+    }
+
+    @PostMapping("/api/teacher_period")
+    public Set<Teacher> teacherPeriod(@RequestParam(required = false) Long groupId,
+                                      @RequestParam(required = false) Integer course,
+                                      @RequestParam(required = false) Long facultyId,
+                                      @RequestParam(required = false) Integer term,
+                                      @RequestBody(required = false) DepartmentLessonsQuery query) {
+        GroupEntity groupEntity = null;
+        if (groupId != null) {
+            groupEntity = groupRepository.findById(groupId).orElse(null);
+            if (groupEntity == null) {
+                return new HashSet<>();
+            }
+        }
+        FacultyEntity facultyEntity = null;
+        if (facultyId != null) {
+            facultyEntity = facultyRepository.findById(facultyId).orElse(null);
+            if (facultyEntity == null) {
+                return new HashSet<>();
+            }
+        }
+
+        LocalDate start = null;
+        LocalDate end = null;
+        if (query != null && term != null) {
+            start = convertDate(query.getStart());
+            end = convertDate(query.getEnd());
+        }
+
+        if (start != null && end != null) {
+            start = start.minusYears((term - 1) / 2)
+                    .minusMonths(term % 2 == 0 ? 5 : 0);
+            end = end.minusYears((term - 1) / 2)
+                    .minusMonths(term % 2 == 0 ? 5 : 0);
+        }
+
+        return lessonRepository.findByGroup(groupEntity, course, facultyEntity, null, term,
+                        start, end).stream()
                 .map(LessonEntity::getTeacher)
                 .map(Teacher::new)
                 .collect(Collectors.toSet());
