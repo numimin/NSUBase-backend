@@ -2,11 +2,13 @@ package com.github.numi;
 
 import com.github.numi.students.entities.FacultyEntity;
 import com.github.numi.students.entities.GroupEntity;
+import com.github.numi.students.entities.MarkEntity;
 import com.github.numi.students.entities.StudentEntity;
 import com.github.numi.students.enums.Gender;
 import com.github.numi.students.json.*;
 import com.github.numi.students.repositories.FacultyRepository;
 import com.github.numi.students.repositories.GroupRepository;
+import com.github.numi.students.repositories.MarkRepository;
 import com.github.numi.students.repositories.StudentRepository;
 import com.github.numi.teachers.entities.DepartmentEntity;
 import com.github.numi.teachers.entities.LessonEntity;
@@ -39,6 +41,7 @@ public class NSUBaseApplication {
     private final TeacherRepository teacherRepository;
     private final DepartmentRepository departmentRepository;
     private final LessonRepository lessonRepository;
+    private final MarkRepository markRepository;
     public static void main(String[] args) {
         SpringApplication.run(com.github.numi.NSUBaseApplication.class, args);
     }
@@ -48,13 +51,15 @@ public class NSUBaseApplication {
                               FacultyRepository facultyRepository,
                               TeacherRepository teacherRepository,
                               DepartmentRepository departmentRepository,
-                              LessonRepository lessonRepository) {
+                              LessonRepository lessonRepository,
+                              MarkRepository markRepository) {
         this.studentRepository = studentRepository;
         this.groupRepository = groupRepository;
         this.facultyRepository = facultyRepository;
         this.teacherRepository = teacherRepository;
         this.departmentRepository = departmentRepository;
         this.lessonRepository = lessonRepository;
+        this.markRepository = markRepository;
 
         FacultyEntity fen = new FacultyEntity("ФЕН");
         facultyRepository.save(fen);
@@ -68,13 +73,14 @@ public class NSUBaseApplication {
         GroupEntity group22404_1 = new GroupEntity("22404.1", LocalDate.of(2022, 8, 31), fen);
         groupRepository.save(group22404_1);
 
-        studentRepository.save(new StudentEntity(
+        StudentEntity sadriev = new StudentEntity(
                 "Сергей", "Геря", "Артемович",
                 LocalDate.of(2002, 1, 1),
                 Gender.MALE, false,
                 5000,
                 group20201
-        ));
+        );
+        studentRepository.save(sadriev);
 
         DepartmentEntity si = new DepartmentEntity("СИ", fit);
         departmentRepository.save(si);
@@ -93,6 +99,9 @@ public class NSUBaseApplication {
         LessonEntity tpns20202 = new LessonEntity("Теория и Практика Нейронных Сетей",
                 kugaevskikh, group20202, 6, 3, LessonType.PRACTICE);
         lessonRepository.save(tpns20202);
+
+        MarkEntity mark = new MarkEntity(tpns20201, sadriev, 5);
+        markRepository.save(mark);
     }
 
     private static <T, U, R> Set<R> retrieveAll(List<Optional<T>> lhs, List<Optional<U>> rhs, BiFunction<T, U, Set<R>> function) {
@@ -374,5 +383,24 @@ public class NSUBaseApplication {
                 .map(LessonEntity::getTeacher)
                 .map(Teacher::new)
                 .collect(Collectors.toSet());
+    }
+
+    @GetMapping("/api/students_with_marks")
+    public Set<Student> studentsWithMarks(@RequestParam(required = false) Long lessonId,
+                                          @RequestParam(required = false) Integer mark,
+                                          @RequestBody(required = false) StudentsWithMarksQuery query) {
+        LessonEntity lessonEntity = null;
+        if (lessonId != null) {
+            lessonEntity = lessonRepository.findById(lessonId).orElse(null);
+            if (lessonEntity == null) {
+                return new HashSet<>();
+            }
+        }
+        final LessonEntity finalLessonEntity = lessonEntity;
+        return retrieveAll(Arrays.stream(query.getGroupIds()).map(groupRepository::findById).toList(), null,
+                (group, none) -> markRepository.findMarks(null, finalLessonEntity, mark)
+                        .stream().map(MarkEntity::getStudent)
+                        .map(Student::new)
+                        .collect(Collectors.toSet()));
     }
 }
