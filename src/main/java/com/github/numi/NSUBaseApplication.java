@@ -316,6 +316,18 @@ public class NSUBaseApplication {
                 .collect(Collectors.toSet());
     }
 
+    @PostMapping("/api/lessons_post")
+    public Set<Lesson> lessonsPost(@RequestBody(required = false) LessonsQuery query) {
+        System.out.println("here0");
+        return retrieveAll(query == null ? null : query.getGroupIds() == null ? null : Arrays.stream(query.getGroupIds()).map(groupRepository::findById).toList(), null,
+                (group, none) -> {
+                    System.out.println("here");
+                    return lessonRepository.findByGroup(group, null).stream()
+                            .map(Lesson::new)
+                            .collect(Collectors.toSet());
+                });
+    }
+
     @GetMapping("/api/teacher_lessons")
     public Set<Teacher> teacherLessons(@RequestParam(required = false) Long groupId,
                                           @RequestParam(required = false) Long lessonId,
@@ -385,7 +397,7 @@ public class NSUBaseApplication {
                 .collect(Collectors.toSet());
     }
 
-    @GetMapping("/api/students_with_marks")
+    @PostMapping("/api/students_with_marks")
     public Set<Student> studentsWithMarks(@RequestParam(required = false) Long lessonId,
                                           @RequestParam(required = false) Integer mark,
                                           @RequestBody(required = false) StudentsWithMarksQuery query) {
@@ -397,10 +409,12 @@ public class NSUBaseApplication {
             }
         }
         final LessonEntity finalLessonEntity = lessonEntity;
-        return retrieveAll(Arrays.stream(query.getGroupIds()).map(groupRepository::findById).toList(), null,
-                (group, none) -> markRepository.findMarks(null, finalLessonEntity, mark)
-                        .stream().map(MarkEntity::getStudent)
-                        .map(Student::new)
-                        .collect(Collectors.toSet()));
+        return retrieveAll(query == null ? null : Arrays.stream(query.getGroupIds()).map(groupRepository::findById).toList(), null,
+                (group, none) -> {
+                    return markRepository.findMarks(null, finalLessonEntity, mark)
+                            .stream().map(MarkEntity::getStudent)
+                            .map(Student::new)
+                            .collect(Collectors.toSet());
+                });
     }
 }
