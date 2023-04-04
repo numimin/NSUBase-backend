@@ -228,6 +228,8 @@ public class NSUBaseApplication {
                         graduateStudent, convertDate(query.getPhdThesisStartDate()),
                         convertDate(query.getPhdThesisEndDate()),
                         department, faculty));
+        System.out.println(query.getPhdThesisStartDate() != null ? convertDate(query.getPhdThesisStartDate()) : null);
+        System.out.println(query.getPhdThesisEndDate() != null ? convertDate(query.getPhdThesisEndDate()) : null);
         if (entities == null) return new ArrayList<>();
         return entities.stream().map(Teacher::new).toList();
     }
@@ -277,14 +279,14 @@ public class NSUBaseApplication {
         }
 
         if (start != null && end != null) {
-            start = start.minusYears(term / 2)
+            start = start.minusYears((term - 1) / 2)
                     .minusMonths(term % 2 == 0 ? 5 : 0);
-            end = end.minusYears(term / 2)
+            end = end.minusYears((term - 1) / 2)
                     .minusMonths(term % 2 == 0 ? 5 : 0);
         }
 
-        System.out.println(start != null ? start.getYear() : null);
-        System.out.println(end != null ? end.getYear() : null);
+        System.out.println(start);
+        System.out.println(end);
 
         return lessonRepository.findByGroup(groupEntity, course, facultyEntity, null, term,
                         start, end).stream()
