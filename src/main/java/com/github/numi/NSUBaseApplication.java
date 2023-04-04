@@ -228,8 +228,6 @@ public class NSUBaseApplication {
                         graduateStudent, convertDate(query.getPhdThesisStartDate()),
                         convertDate(query.getPhdThesisEndDate()),
                         department, faculty));
-        System.out.println(query.getPhdThesisStartDate() != null ? convertDate(query.getPhdThesisStartDate()) : null);
-        System.out.println(query.getPhdThesisEndDate() != null ? convertDate(query.getPhdThesisEndDate()) : null);
         if (entities == null) return new ArrayList<>();
         return entities.stream().map(Teacher::new).toList();
     }
@@ -294,7 +292,8 @@ public class NSUBaseApplication {
     }
 
     @GetMapping("/api/lessons")
-    public Set<Lesson> lessons(@RequestParam(required = false) Long groupId) {
+    public Set<Lesson> lessons(@RequestParam(required = false) Long groupId,
+                               @RequestParam(required = false) Integer course) {
         GroupEntity groupEntity = null;
         if (groupId != null) {
             groupEntity = groupRepository.findById(groupId).orElse(null);
@@ -302,7 +301,7 @@ public class NSUBaseApplication {
                 return new HashSet<>();
             }
         }
-        return lessonRepository.findByGroup(groupEntity).stream()
+        return lessonRepository.findByGroup(groupEntity, course).stream()
                 .map(Lesson::new)
                 .collect(Collectors.toSet());
     }

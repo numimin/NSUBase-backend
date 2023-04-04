@@ -26,6 +26,9 @@ public interface LessonRepository extends CrudRepository<LessonEntity, Long> {
                                    @Param("start")LocalDate start,
                                    @Param("end") LocalDate end);
 
-    @Query("SELECT l FROM LessonEntity l WHERE (:group IS NULL OR l.group = :group)")
-    Set<LessonEntity> findByGroup(@Param("group") GroupEntity group);
+    @Query("SELECT l FROM LessonEntity l WHERE (:group IS NULL OR l.group = :group) AND" +
+            "(:course IS NULL OR :course = l.course)"
+    )
+    Set<LessonEntity> findByGroup(@Param("group") GroupEntity group,
+                                  @Param("course") Integer course);
 }
