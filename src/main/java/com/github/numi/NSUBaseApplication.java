@@ -285,9 +285,6 @@ public class NSUBaseApplication {
                     .minusMonths(term % 2 == 0 ? 5 : 0);
         }
 
-        System.out.println(start);
-        System.out.println(end);
-
         return lessonRepository.findByGroup(groupEntity, course, facultyEntity, null, term,
                         start, end).stream()
                 .map(LessonEntity::getTeacher)
