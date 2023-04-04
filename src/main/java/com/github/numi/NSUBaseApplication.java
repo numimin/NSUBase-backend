@@ -318,10 +318,8 @@ public class NSUBaseApplication {
 
     @PostMapping("/api/lessons_post")
     public Set<Lesson> lessonsPost(@RequestBody(required = false) LessonsQuery query) {
-        System.out.println("here0");
         return retrieveAll(query == null ? null : query.getGroupIds() == null ? null : Arrays.stream(query.getGroupIds()).map(groupRepository::findById).toList(), null,
                 (group, none) -> {
-                    System.out.println("here");
                     return lessonRepository.findByGroup(group, null).stream()
                             .map(Lesson::new)
                             .collect(Collectors.toSet());
@@ -412,6 +410,29 @@ public class NSUBaseApplication {
         return retrieveAll(query == null ? null : Arrays.stream(query.getGroupIds()).map(groupRepository::findById).toList(), null,
                 (group, none) -> {
                     return markRepository.findMarks(null, finalLessonEntity, mark)
+                            .stream().map(MarkEntity::getStudent)
+                            .map(Student::new)
+                            .collect(Collectors.toSet());
+                });
+    }
+
+    @PostMapping("/api/students_of_course_with_marks")
+    public Set<Student> studentsOfCourseWithMarks(@RequestParam(required = false) Integer course,
+                                                @RequestParam(required = false) Long facultyId,
+                                                @RequestParam(required = false) Integer term,
+                                                 @RequestBody(required = false) StudentsOfCourseWithMarksQuery query) {
+        FacultyEntity facultyEntity = null;
+        if (facultyId != null) {
+            facultyEntity = facultyRepository.findById(facultyId).orElse(null);
+            if (facultyEntity == null) {
+                return new HashSet<>();
+            }
+        }
+        final FacultyEntity finalFacultyEntity = facultyEntity;
+        return retrieveAll(query == null ? null : Arrays.stream(query.getGroupIds()).map(groupRepository::findById).toList(),
+                query == null ? null : Arrays.stream(query.getMarks()).map(Optional::of).toList(),
+                (group, mark) -> {
+                    return markRepository.findMarks(course, finalFacultyEntity, group, term, mark)
                             .stream().map(MarkEntity::getStudent)
                             .map(Student::new)
                             .collect(Collectors.toSet());
