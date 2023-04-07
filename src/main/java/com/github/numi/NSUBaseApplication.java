@@ -100,7 +100,7 @@ public class NSUBaseApplication {
                 kugaevskikh, group20202, 6, 3, LessonType.PRACTICE);
         lessonRepository.save(tpns20202);
 
-        MarkEntity mark = new MarkEntity(tpns20201, sadriev, 5);
+        MarkEntity mark = new MarkEntity(tpns20201, sadriev, 5, LocalDate.of(2022, 6, 1));
         markRepository.save(mark);
     }
 
@@ -212,6 +212,7 @@ public class NSUBaseApplication {
     }
 
     private static LocalDate convertDate(DateStruct dateStruct) {
+        if (dateStruct == null) return null;
         if (dateStruct.year < 0 || dateStruct.month < 0 || dateStruct.day < 0) return null;
         try {
             return LocalDate.of(dateStruct.year, dateStruct.month, dateStruct.day);
@@ -449,5 +450,30 @@ public class NSUBaseApplication {
                         .map(LessonEntity::getTeacher)
                         .map(Teacher::new)
                         .collect(Collectors.toSet()));
+    }
+
+    @PostMapping("/api/students_exams")
+    public Set<Student> studentsExams(@RequestParam(required = false) Long teacherId,
+                                      @RequestParam(required = false) Integer mark,
+                                      @RequestBody(required = false) StudentsExamsQuery query) {
+        TeacherEntity teacherEntity = null;
+        if (teacherId != null) {
+            teacherEntity = teacherRepository.findById(teacherId).orElse(null);
+            if (teacherEntity == null) {
+                return new HashSet<>();
+            }
+        }
+        final Set<MarkEntity> marks = new HashSet<>();
+        for (Long groupId: query == null || query.getGroupIds().length == 0 ? new Long[] {null} : query.getGroupIds()) {
+            for (Long lessonId: query == null || query.getLessonIds().length == 0 ? new Long[] {null} : query.getLessonIds()) {
+                for (Integer term: query == null || query.getTerms().length == 0 ? new Integer[] {null} : query.getTerms()) {
+                    final GroupEntity groupEntity = groupId == null ? null : groupRepository.findById(groupId).orElse(null);
+                    final LessonEntity lessonEntity = lessonId == null ? null : lessonRepository.findById(lessonId).orElse(null);
+                    marks.addAll(markRepository.findMarks(groupEntity, term, mark, lessonEntity, teacherEntity,
+                            convertDate(query == null ? null : query.getStart()), convertDate(query == null ? null : query.getEnd())));
+                }
+            }
+        }
+        return marks.stream().map(MarkEntity::getStudent).map(Student::new).collect(Collectors.toSet());
     }
 }

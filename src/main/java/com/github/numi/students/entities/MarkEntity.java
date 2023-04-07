@@ -1,9 +1,9 @@
 package com.github.numi.students.entities;
 
 import com.github.numi.teachers.entities.LessonEntity;
-import com.github.numi.teachers.entities.TeacherEntity;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 public class MarkEntity {
@@ -17,11 +17,13 @@ public class MarkEntity {
     @JoinColumn(name="student_id", nullable = false)
     private StudentEntity student;
     private Integer mark;
+    private LocalDate date;
 
-    public MarkEntity(LessonEntity lesson, StudentEntity student, Integer mark) {
+    public MarkEntity(LessonEntity lesson, StudentEntity student, Integer mark, LocalDate date) {
         this.lesson = lesson;
         this.student = student;
         this.mark = mark;
+        this.date = date;
     }
 
     protected MarkEntity() {}
@@ -56,5 +58,13 @@ public class MarkEntity {
 
     public void setMark(Integer mark) {
         this.mark = mark;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 }

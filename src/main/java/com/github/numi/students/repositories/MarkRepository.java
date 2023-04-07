@@ -4,6 +4,7 @@ import com.github.numi.students.entities.FacultyEntity;
 import com.github.numi.students.entities.GroupEntity;
 import com.github.numi.students.entities.MarkEntity;
 import com.github.numi.teachers.entities.LessonEntity;
+import com.github.numi.teachers.entities.TeacherEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -34,4 +35,20 @@ public interface MarkRepository extends CrudRepository<MarkEntity, Long> {
                               @Param("group")GroupEntity group,
                               @Param("term") Integer term,
                               @Param("mark") Integer mark);
+
+    @Query("SELECT m FROM MarkEntity m WHERE " +
+            "(:group IS NULL OR :group = m.student.group) AND" +
+            "(:term IS NULL OR :term = m.lesson.term) AND" +
+            "(:mark IS NULL OR :mark = m.mark) AND " +
+            "(:lesson IS NULL OR :lesson = m.lesson) AND " +
+            "(:teacher IS NULL OR :teacher = m.lesson.teacher) AND " +
+            "(:start IS NULL OR :end IS NULL OR m.date BETWEEN :start AND :end)"
+    )
+    Set<MarkEntity> findMarks(@Param("group")GroupEntity group,
+                              @Param("term") Integer term,
+                              @Param("mark") Integer mark,
+                              @Param("lesson") LessonEntity lesson,
+                              @Param("teacher") TeacherEntity teacher,
+                              @Param("start") LocalDate start,
+                              @Param("end") LocalDate end);
 }
