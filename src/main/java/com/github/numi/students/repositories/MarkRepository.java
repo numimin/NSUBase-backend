@@ -15,11 +15,13 @@ public interface MarkRepository extends CrudRepository<MarkEntity, Long> {
     @Query("SELECT m FROM MarkEntity m WHERE " +
             "(:group IS NULL OR :group = m.student.group) AND " +
             "(:lesson IS NULL OR :lesson = m.lesson) AND " +
-            "(:mark IS NULL OR :mark = m.mark)"
+            "(:mark IS NULL OR :mark = m.mark) AND " +
+            "(:term IS NULL OR :term = m.lesson.term)"
     )
     Set<MarkEntity> findMarks(@Param("group")GroupEntity group,
                               @Param("lesson")LessonEntity lesson,
-                              @Param("mark") Integer mark);
+                              @Param("mark") Integer mark,
+                              @Param("term") Integer term);
     @Query("SELECT m FROM MarkEntity m WHERE " +
             "(:course IS NULL OR :course = m.lesson.course) AND" +
             "(:faculty IS NULL OR :faculty = m.student.group.faculty) AND" +

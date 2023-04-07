@@ -1,6 +1,7 @@
 package com.github.numi.students.entities;
 
 import com.github.numi.teachers.entities.LessonEntity;
+import com.github.numi.teachers.entities.TeacherEntity;
 
 import javax.persistence.*;
 

@@ -409,7 +409,7 @@ public class NSUBaseApplication {
         final LessonEntity finalLessonEntity = lessonEntity;
         return retrieveAll(query == null ? null : Arrays.stream(query.getGroupIds()).map(groupRepository::findById).toList(), null,
                 (group, none) -> {
-                    return markRepository.findMarks(null, finalLessonEntity, mark)
+                    return markRepository.findMarks(null, finalLessonEntity, mark, null)
                             .stream().map(MarkEntity::getStudent)
                             .map(Student::new)
                             .collect(Collectors.toSet());
@@ -437,5 +437,17 @@ public class NSUBaseApplication {
                             .map(Student::new)
                             .collect(Collectors.toSet());
                 });
+    }
+
+    @PostMapping("/api/teachers_exams")
+    public Set<Teacher> teachersExams(@RequestParam(required = false) Integer term,
+            @RequestBody(required = false) TeachersExamsQuery query) {
+        return retrieveAll(query == null ? null : Arrays.stream(query.getGroupIds()).map(groupRepository::findById).toList(),
+                query == null ? null : Arrays.stream(query.getLessonIds()).map(lessonRepository::findById).toList(),
+                (group, lesson) -> markRepository.findMarks(group, lesson, null, term)
+                        .stream().map(MarkEntity::getLesson)
+                        .map(LessonEntity::getTeacher)
+                        .map(Teacher::new)
+                        .collect(Collectors.toSet()));
     }
 }
