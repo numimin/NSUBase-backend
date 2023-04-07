@@ -508,4 +508,29 @@ public class NSUBaseApplication {
                 .stream().map(w -> new StudentGraduateWork(w.getStudent(), w))
                 .collect(Collectors.toSet());
     }
+
+    @GetMapping("/api/teachers_graduate_works")
+    public Set<Teacher> teachersGraduateWorks(@RequestParam(required = false) Long departmentId,
+                                              @RequestParam(required = false) Long facultyId,
+                                              @RequestParam(required = false) Category category) {
+        DepartmentEntity departmentEntity = null;
+        if (departmentId != null) {
+            departmentEntity = departmentRepository.findById(departmentId).orElse(null);
+            if (departmentEntity == null) {
+                return new HashSet<>();
+            }
+        }
+        FacultyEntity facultyEntity = null;
+        if (facultyId != null) {
+            facultyEntity = facultyRepository.findById(facultyId).orElse(null);
+            if (facultyEntity == null) {
+                return new HashSet<>();
+            }
+        }
+
+        return graduateWorkRepository.findGraduateWorks(departmentEntity, facultyEntity, category)
+                .stream().map(GraduateWorkEntity::getTeacher)
+                .map(Teacher::new)
+                .collect(Collectors.toSet());
+    }
 }
