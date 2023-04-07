@@ -11,12 +11,14 @@ import com.github.numi.students.repositories.GroupRepository;
 import com.github.numi.students.repositories.MarkRepository;
 import com.github.numi.students.repositories.StudentRepository;
 import com.github.numi.teachers.entities.DepartmentEntity;
+import com.github.numi.teachers.entities.GraduateWorkEntity;
 import com.github.numi.teachers.entities.LessonEntity;
 import com.github.numi.teachers.entities.TeacherEntity;
 import com.github.numi.teachers.enums.Category;
 import com.github.numi.teachers.enums.LessonType;
 import com.github.numi.teachers.json.*;
 import com.github.numi.teachers.repositories.DepartmentRepository;
+import com.github.numi.teachers.repositories.GraduateWorkRepository;
 import com.github.numi.teachers.repositories.LessonRepository;
 import com.github.numi.teachers.repositories.TeacherRepository;
 import com.github.numi.utils.DateStruct;
@@ -42,6 +44,7 @@ public class NSUBaseApplication {
     private final DepartmentRepository departmentRepository;
     private final LessonRepository lessonRepository;
     private final MarkRepository markRepository;
+    private final GraduateWorkRepository graduateWorkRepository;
     public static void main(String[] args) {
         SpringApplication.run(com.github.numi.NSUBaseApplication.class, args);
     }
@@ -52,7 +55,8 @@ public class NSUBaseApplication {
                               TeacherRepository teacherRepository,
                               DepartmentRepository departmentRepository,
                               LessonRepository lessonRepository,
-                              MarkRepository markRepository) {
+                              MarkRepository markRepository,
+                              GraduateWorkRepository graduateWorkRepository) {
         this.studentRepository = studentRepository;
         this.groupRepository = groupRepository;
         this.facultyRepository = facultyRepository;
@@ -60,6 +64,7 @@ public class NSUBaseApplication {
         this.departmentRepository = departmentRepository;
         this.lessonRepository = lessonRepository;
         this.markRepository = markRepository;
+        this.graduateWorkRepository = graduateWorkRepository;
 
         FacultyEntity fen = new FacultyEntity("ФЕН");
         facultyRepository.save(fen);
@@ -102,6 +107,10 @@ public class NSUBaseApplication {
 
         MarkEntity mark = new MarkEntity(tpns20201, sadriev, 5, LocalDate.of(2022, 6, 1));
         markRepository.save(mark);
+
+        graduateWorkRepository.save(new GraduateWorkEntity(
+                "Теория Поля", sadriev, kugaevskikh
+        ));
     }
 
     private static <T, U, R> Set<R> retrieveAll(List<Optional<T>> lhs, List<Optional<U>> rhs, BiFunction<T, U, Set<R>> function) {
@@ -475,5 +484,28 @@ public class NSUBaseApplication {
             }
         }
         return marks.stream().map(MarkEntity::getStudent).map(Student::new).collect(Collectors.toSet());
+    }
+
+    @GetMapping("/api/students_graduate_works")
+    public Set<StudentGraduateWork> studentsGraduateWorks(@RequestParam(required = false) Long departmentId,
+                                                          @RequestParam(required = false) Long teacherId) {
+        TeacherEntity teacherEntity = null;
+        if (teacherId != null) {
+            teacherEntity = teacherRepository.findById(teacherId).orElse(null);
+            if (teacherEntity == null) {
+                return new HashSet<>();
+            }
+        }
+        DepartmentEntity departmentEntity = null;
+        if (departmentId != null) {
+            departmentEntity = departmentRepository.findById(departmentId).orElse(null);
+            if (departmentEntity == null) {
+                return new HashSet<>();
+            }
+        }
+
+        return graduateWorkRepository.findGraduateWorks(departmentEntity, teacherEntity)
+                .stream().map(w -> new StudentGraduateWork(w.getStudent(), w))
+                .collect(Collectors.toSet());
     }
 }
