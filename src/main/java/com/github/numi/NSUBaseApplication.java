@@ -99,10 +99,10 @@ public class NSUBaseApplication {
         teacherRepository.save(kugaevskikh);
 
         LessonEntity tpns20201 = new LessonEntity("Теория и Практика Нейронных Сетей",
-                kugaevskikh, group20201, 6, 3, LessonType.LECTURE);
+                kugaevskikh, group20201, 6, 3, LessonType.LECTURE, 72L);
         lessonRepository.save(tpns20201);
         LessonEntity tpns20202 = new LessonEntity("Теория и Практика Нейронных Сетей",
-                kugaevskikh, group20202, 6, 3, LessonType.PRACTICE);
+                kugaevskikh, group20202, 6, 3, LessonType.PRACTICE, 64L);
         lessonRepository.save(tpns20202);
 
         MarkEntity mark = new MarkEntity(tpns20201, sadriev, 5, LocalDate.of(2022, 6, 1));
@@ -532,5 +532,26 @@ public class NSUBaseApplication {
                 .stream().map(GraduateWorkEntity::getTeacher)
                 .map(Teacher::new)
                 .collect(Collectors.toSet());
+    }
+
+    @GetMapping("/api/teachers_load")
+    public Load teachersLoad(@RequestParam(required = false) Long teacherId,
+                                  @RequestParam(required = false) Long departmentId) {
+        DepartmentEntity departmentEntity = null;
+        if (departmentId != null) {
+            departmentEntity = departmentRepository.findById(departmentId).orElse(null);
+            if (departmentEntity == null) {
+                return new Load(new Lesson[]{}, new Type[] {});
+            }
+        }
+        TeacherEntity teacherEntity = null;
+        if (teacherId != null) {
+            teacherEntity = teacherRepository.findById(teacherId).orElse(null);
+            if (teacherEntity == null) {
+                return new Load(new Lesson[]{}, new Type[] {});
+            }
+        }
+        return new Load(lessonRepository.findLessons(teacherEntity, departmentEntity).stream().map(Lesson::new).toList().toArray(new Lesson[] {}),
+                        lessonRepository.findTypes(teacherEntity, departmentEntity).toArray(new Type[] {}));
     }
 }

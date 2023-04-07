@@ -13,8 +13,9 @@ public class Lesson {
     private Integer term;
     private Integer course;
     private LessonType type;
+    private Long hours;
 
-    public Lesson(Long id, String name, Long teacherId, Long groupId, Integer term, Integer course, LessonType type) {
+    public Lesson(Long id, String name, Long teacherId, Long groupId, Integer term, Integer course, LessonType type, Long hours) {
         this.id = id;
         this.name = name;
         this.teacherId = teacherId;
@@ -22,6 +23,7 @@ public class Lesson {
         this.term = term;
         this.course = course;
         this.type = type;
+        this.hours = hours;
     }
 
     public Lesson(LessonEntity entity) {
@@ -32,6 +34,7 @@ public class Lesson {
         term = entity.getTerm();
         course = entity.getCourse();
         type = entity.getType();
+        hours = entity.getHours();
     }
 
     public Lesson() {}
@@ -103,5 +106,13 @@ public class Lesson {
 
     public void setType(LessonType type) {
         this.type = type;
+    }
+
+    public Long getHours() {
+        return hours;
+    }
+
+    public void setHours(Long hours) {
+        this.hours = hours;
     }
 }

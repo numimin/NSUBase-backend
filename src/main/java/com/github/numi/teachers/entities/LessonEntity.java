@@ -22,19 +22,22 @@ public class LessonEntity {
     private Integer course;
 
     private LessonType type;
+    private Long hours;
 
     public LessonEntity(String name,
                         TeacherEntity teacher,
                         GroupEntity group,
                         Integer term,
                         Integer course,
-                        LessonType type) {
+                        LessonType type,
+                        Long hours) {
         this.name = name;
         this.teacher = teacher;
         this.group = group;
         this.term = term;
         this.course = course;
         this.type = type;
+        this.hours = hours;
     }
 
     protected LessonEntity() {}
@@ -93,5 +96,13 @@ public class LessonEntity {
 
     public void setType(LessonType type) {
         this.type = type;
+    }
+
+    public Long getHours() {
+        return hours;
+    }
+
+    public void setHours(Long hours) {
+        this.hours = hours;
     }
 }

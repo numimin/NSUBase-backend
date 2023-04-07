@@ -2,12 +2,17 @@ package com.github.numi.teachers.repositories;
 
 import com.github.numi.students.entities.FacultyEntity;
 import com.github.numi.students.entities.GroupEntity;
+import com.github.numi.teachers.entities.DepartmentEntity;
 import com.github.numi.teachers.entities.LessonEntity;
+import com.github.numi.teachers.entities.TeacherEntity;
+import com.github.numi.teachers.json.Load;
+import com.github.numi.teachers.json.Type;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Set;
 
 public interface LessonRepository extends CrudRepository<LessonEntity, Long> {
@@ -31,4 +36,19 @@ public interface LessonRepository extends CrudRepository<LessonEntity, Long> {
     )
     Set<LessonEntity> findByGroup(@Param("group") GroupEntity group,
                                   @Param("course") Integer course);
+
+    @Query("SELECT l FROM LessonEntity l WHERE " +
+            "(:teacher IS NULL OR :teacher = l.teacher) AND " +
+            "(:department IS NULL OR :department = l.teacher.department)"
+    )
+    Set<LessonEntity> findLessons(@Param("teacher") TeacherEntity teacher,
+                       @Param("department") DepartmentEntity department);
+    @Query("SELECT NEW com.github.numi.teachers.json.Type(l.type, SUM(l.hours)) FROM LessonEntity l WHERE " +
+            "(:teacher IS NULL OR :teacher = l.teacher) AND " +
+            "(:department IS NULL OR :department = l.teacher.department) " +
+            "GROUP BY l.type"
+    )
+
+    Set<Type> findTypes(@Param("teacher") TeacherEntity teacher,
+                        @Param("department") DepartmentEntity department);
 }
