@@ -1,5 +1,6 @@
 package com.github.numi;
 
+import com.github.numi.add.AddStudentBody;
 import com.github.numi.students.entities.FacultyEntity;
 import com.github.numi.students.entities.GroupEntity;
 import com.github.numi.students.entities.MarkEntity;
@@ -95,8 +96,16 @@ public class NSUBaseApplication {
         TeacherEntity kugaevskikh = new TeacherEntity("Александр", "Кугаевских", "",
                 Category.ASSISTANT_PROFESSOR, Gender.MALE, false, 50000,
                 false, LocalDate.of(2013, 12, 5), kt,
-                "Теория поля", null);
+                "Теория и Практика Нейронных Сетей", null);
         teacherRepository.save(kugaevskikh);
+        teacherRepository.save(new TeacherEntity("Cергей", "Кугаевских", "",
+                Category.ASSISTANT_PROFESSOR, Gender.MALE, false, 50000,
+                false, LocalDate.of(2013, 12, 5), kt,
+                "Теория поля", null));
+        teacherRepository.save(new TeacherEntity("Cергей", "Кугаевских", "",
+                Category.ASSISTANT_PROFESSOR, Gender.MALE, false, 50000,
+                false, LocalDate.of(2013, 12, 5), kt,
+                "Физика", null));
 
         LessonEntity tpns20201 = new LessonEntity("Теория и Практика Нейронных Сетей",
                 kugaevskikh, group20201, 6, 3, LessonType.LECTURE, 72L);
@@ -253,7 +262,7 @@ public class NSUBaseApplication {
     }
 
     @PostMapping("/api/dissertations")
-    public List<String> dissertations(@RequestBody DissertationsQuery query) {
+    public Set<String> dissertations(@RequestBody DissertationsQuery query) {
         Set<TeacherEntity> entities = retrieveAll(Arrays.stream(query.getFaculties())
                         .map(facultyRepository::findById)
                         .toList(),
@@ -262,10 +271,11 @@ public class NSUBaseApplication {
                         .toList(),
                 (faculty, department) -> teacherRepository
                         .findTeachersByAffinity(department, faculty));
-        if (entities == null) return new ArrayList<>();
+        if (entities == null) return new HashSet<>();
         return Stream.concat(entities.stream().map(TeacherEntity::getDoctoralDissertation),
                          entities.stream().map(TeacherEntity::getPhdDissertation))
-                .toList();
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 
     @PostMapping("/api/department_lessons")
@@ -553,5 +563,20 @@ public class NSUBaseApplication {
         }
         return new Load(lessonRepository.findLessons(teacherEntity, departmentEntity).stream().map(Lesson::new).toList().toArray(new Lesson[] {}),
                         lessonRepository.findTypes(teacherEntity, departmentEntity).toArray(new Type[] {}));
+    }
+
+    @PostMapping("/api/student/add")
+    public void addStudent(@RequestBody AddStudentBody student) {
+        Optional<GroupEntity> groupEntity = groupRepository.findById(student.getGroupId());
+        groupEntity.ifPresent(entity -> studentRepository.save(new StudentEntity(
+                student.getFirstname(),
+                student.getLastname(),
+                student.getPatronymic(),
+                convertDate(student.getDateOfBirth()),
+                student.getGender(),
+                student.getHasChildren(),
+                student.getScholarship(),
+                entity
+        )));
     }
 }
