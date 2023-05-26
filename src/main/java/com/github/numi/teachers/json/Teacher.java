@@ -20,6 +20,9 @@ public class Teacher {
     private LocalDate phdThesisDate;
     private Long departmentId;
 
+    private String phdDissertation;
+    private String doctoralDissertation;
+
     public Teacher(Long id,
                    String firstname,
                    String lastname,
@@ -56,6 +59,8 @@ public class Teacher {
         this.graduateStudent = entity.getGraduateStudent();
         this.phdThesisDate = entity.getPhdThesisDate();
         this.departmentId = entity.getDepartment().getId();
+        this.doctoralDissertation = entity.getDoctoralDissertation();
+        this.phdDissertation = entity.getPhdDissertation();
     }
 
     public Long getId() {
@@ -100,6 +105,14 @@ public class Teacher {
 
     public String getPatronymic() {
         return patronymic;
+    }
+
+    public String getDoctoralDissertation() {
+        return doctoralDissertation;
+    }
+
+    public String getPhdDissertation() {
+        return phdDissertation;
     }
 
     @Override

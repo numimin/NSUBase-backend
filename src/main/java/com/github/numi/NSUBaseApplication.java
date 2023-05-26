@@ -669,28 +669,36 @@ public class NSUBaseApplication {
         return new Result(true, "Преподаватель успешно удален");
     }
 
-    /*@PostMapping("/api/student/update")
+    @PostMapping("/api/teacher/update")
     @Transactional
-    public Result updateStudent(@RequestParam Long id, @RequestBody AddStudentBody student) {
-        Optional<GroupEntity> groupEntity = groupRepository.findById(student.getGroupId());
-        var date = convertDate(student.getDateOfBirth());
-        if (date == null) {
-            return new Result(false, "Поставьте правильную дату");
+    public Result updateTeacher(@RequestParam Long id, @RequestBody AddTeacherBody teacher) {
+        Optional<DepartmentEntity> departmentEntity = departmentRepository.findById(teacher.getDepartmentId());
+        LocalDate date = null;
+        if (teacher.getPhdThesisDate() != null) {
+            date = convertDate(teacher.getPhdThesisDate());
+            if (date == null) {
+                return new Result(false, "Поставьте правильную дату");
+            }
         }
-        groupEntity.ifPresent(entity -> {
-            var newEntity = new StudentEntity(
-                    student.getFirstname(),
-                    student.getLastname(),
-                    student.getPatronymic(),
-                    date,
-                    student.getGender(),
-                    student.getHasChildren(),
-                    student.getScholarship(),
-                    entity
+        final var localDate = date;
+        departmentEntity.ifPresent(entity -> {
+            var newEntity = new TeacherEntity(
+                    teacher.getFirstname(),
+                    teacher.getLastname(),
+                    teacher.getPatronymic(),
+                    teacher.getCategory(),
+                    teacher.getGender(),
+                    teacher.getHasChildren(),
+                    teacher.getSalary(),
+                    teacher.getGraduateStudent(),
+                    localDate,
+                    entity,
+                    teacher.getPhdDissertation(),
+                    teacher.getDoctoralDissertation()
             );
             newEntity.setId(id);
-            studentRepository.save(newEntity);
+            teacherRepository.save(newEntity);
         });
-        return new Result(true, "Студент успешно изменен");
-    }*/
+        return new Result(true, "Преподаватель успешно изменен");
+    }
 }
