@@ -107,4 +107,8 @@ public class StudentEntity {
     public void setGroup(GroupEntity group) {
         this.group = group;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

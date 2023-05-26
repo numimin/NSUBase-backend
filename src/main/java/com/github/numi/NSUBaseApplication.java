@@ -1,6 +1,7 @@
 package com.github.numi;
 
 import com.github.numi.add.AddStudentBody;
+import com.github.numi.add.WithId;
 import com.github.numi.students.entities.FacultyEntity;
 import com.github.numi.students.entities.GroupEntity;
 import com.github.numi.students.entities.MarkEntity;
@@ -597,5 +598,30 @@ public class NSUBaseApplication {
             return new Result(false, "Нельзя удалить студента пока не удалены все ссылки на него");
         }
         return new Result(true, "Студент успешно удален");
+    }
+
+    @PostMapping("/api/student/update")
+    @Transactional
+    public Result updateStudent(@RequestParam Long id, @RequestBody AddStudentBody student) {
+        Optional<GroupEntity> groupEntity = groupRepository.findById(student.getGroupId());
+        var date = convertDate(student.getDateOfBirth());
+        if (date == null) {
+            return new Result(false, "Поставьте правильную дату");
+        }
+        groupEntity.ifPresent(entity -> {
+            var newEntity = new StudentEntity(
+                    student.getFirstname(),
+                    student.getLastname(),
+                    student.getPatronymic(),
+                    date,
+                    student.getGender(),
+                    student.getHasChildren(),
+                    student.getScholarship(),
+                    entity
+            );
+            newEntity.setId(id);
+            studentRepository.save(newEntity);
+        });
+        return new Result(true, "Студент успешно добавлен");
     }
 }
