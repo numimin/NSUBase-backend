@@ -4,6 +4,7 @@ import com.github.numi.students.entities.FacultyEntity;
 import com.github.numi.students.entities.GroupEntity;
 import com.github.numi.students.entities.StudentEntity;
 import com.github.numi.students.enums.Gender;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -29,4 +30,8 @@ public interface StudentRepository extends CrudRepository<StudentEntity, Long> {
                                    @Param("maxScholarship")Integer maxScholarship,
                                    @Param("group")GroupEntity group,
                                    @Param("faculty") FacultyEntity faculty);
+
+    @Modifying
+    @Query("DELETE FROM StudentEntity s WHERE :id = s.group.id")
+    void deleteByGroupId(@Param("id") Long id);
 }

@@ -1,8 +1,8 @@
 package com.github.numi;
 
+import com.github.numi.add.AddGroupBody;
 import com.github.numi.add.AddStudentBody;
 import com.github.numi.add.AddTeacherBody;
-import com.github.numi.add.WithId;
 import com.github.numi.students.entities.FacultyEntity;
 import com.github.numi.students.entities.GroupEntity;
 import com.github.numi.students.entities.MarkEntity;
@@ -700,5 +700,40 @@ public class NSUBaseApplication {
             teacherRepository.save(newEntity);
         });
         return new Result(true, "Преподаватель успешно изменен");
+    }
+
+    @PostMapping("/api/group/add")
+    public Result addGroup(@RequestBody AddGroupBody group) {
+        Optional<FacultyEntity> facultyEntity = facultyRepository.findById(group.getFacultyId());
+        var date = convertDate(group.getDate());
+        if (date == null) {
+            return new Result(false, "Поставьте правильную дату");
+        }
+        try {
+            facultyEntity.ifPresent(entity -> groupRepository.save(new GroupEntity(
+                    group.getName(),
+                    date,
+                    entity
+            )));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Группа не была добавлена");
+        }
+
+        return new Result(true, "Группа успешно добавлена");
+    }
+
+    @PostMapping("/api/group/delete")
+    @Transactional
+    public Result deleteGroup(@RequestParam Long id) {
+        try {
+            studentRepository.deleteByGroupId(id);
+            lessonRepository.deleteByGroupId(id);
+            groupRepository.deleteById(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Нельзя удалить группу пока не удалены все ссылки на нее");
+        }
+        return new Result(true, "Группа успешно удалена");
     }
 }
