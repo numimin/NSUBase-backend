@@ -1,6 +1,7 @@
 package com.github.numi;
 
 import com.github.numi.add.AddStudentBody;
+import com.github.numi.add.AddTeacherBody;
 import com.github.numi.add.WithId;
 import com.github.numi.students.entities.FacultyEntity;
 import com.github.numi.students.entities.GroupEntity;
@@ -622,6 +623,72 @@ public class NSUBaseApplication {
             newEntity.setId(id);
             studentRepository.save(newEntity);
         });
-        return new Result(true, "Студент успешно добавлен");
+        return new Result(true, "Студент успешно изменен");
     }
+
+    @PostMapping("/api/teacher/add")
+    public Result addTeacher(@RequestBody AddTeacherBody teacher) {
+        Optional<DepartmentEntity> departmentEntity = departmentRepository.findById(teacher.getDepartmentId());
+        LocalDate date = null;
+        if (teacher.getPhdThesisDate() != null) {
+            date = convertDate(teacher.getPhdThesisDate());
+            if (date == null) {
+                return new Result(false, "Поставьте правильную дату");
+            }
+        }
+        final var localDate = date;
+        departmentEntity.ifPresent(entity -> teacherRepository.save(new TeacherEntity(
+                teacher.getFirstname(),
+                teacher.getLastname(),
+                teacher.getPatronymic(),
+                teacher.getCategory(),
+                teacher.getGender(),
+                teacher.getHasChildren(),
+                teacher.getSalary(),
+                teacher.getGraduateStudent(),
+                localDate,
+                entity,
+                teacher.getPhdDissertation(),
+                teacher.getDoctoralDissertation()
+        )));
+        return new Result(true, "Преподаватель успешно добавлен");
+    }
+
+    /*@PostMapping("/api/student/delete")
+    @Transactional
+    public Result deleteStudent(@RequestParam Long id) {
+        try {
+            markRepository.deleteByStudentId(id);
+            graduateWorkRepository.deleteByStudentId(id);
+            studentRepository.deleteById(id);
+        } catch (Exception e) {
+            return new Result(false, "Нельзя удалить студента пока не удалены все ссылки на него");
+        }
+        return new Result(true, "Студент успешно удален");
+    }
+
+    @PostMapping("/api/student/update")
+    @Transactional
+    public Result updateStudent(@RequestParam Long id, @RequestBody AddStudentBody student) {
+        Optional<GroupEntity> groupEntity = groupRepository.findById(student.getGroupId());
+        var date = convertDate(student.getDateOfBirth());
+        if (date == null) {
+            return new Result(false, "Поставьте правильную дату");
+        }
+        groupEntity.ifPresent(entity -> {
+            var newEntity = new StudentEntity(
+                    student.getFirstname(),
+                    student.getLastname(),
+                    student.getPatronymic(),
+                    date,
+                    student.getGender(),
+                    student.getHasChildren(),
+                    student.getScholarship(),
+                    entity
+            );
+            newEntity.setId(id);
+            studentRepository.save(newEntity);
+        });
+        return new Result(true, "Студент успешно изменен");
+    }*/
 }
