@@ -6,6 +6,7 @@ import com.github.numi.teachers.entities.GraduateWorkEntity;
 import com.github.numi.teachers.entities.TeacherEntity;
 import com.github.numi.teachers.enums.Category;
 import com.github.numi.teachers.json.Teacher;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -28,4 +29,8 @@ public interface GraduateWorkRepository extends CrudRepository<GraduateWorkEntit
     Set<GraduateWorkEntity> findGraduateWorks(@Param("department") DepartmentEntity department,
                                               @Param("faculty") FacultyEntity faculty,
                                               @Param("category") Category category);
+
+    @Modifying
+    @Query("DELETE FROM GraduateWorkEntity w WHERE :id = w.student.id")
+    void deleteByStudentId(@Param("id") Long id);
 }

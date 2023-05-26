@@ -28,6 +28,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.*;
@@ -566,17 +567,35 @@ public class NSUBaseApplication {
     }
 
     @PostMapping("/api/student/add")
-    public void addStudent(@RequestBody AddStudentBody student) {
+    public Result addStudent(@RequestBody AddStudentBody student) {
         Optional<GroupEntity> groupEntity = groupRepository.findById(student.getGroupId());
+        var date = convertDate(student.getDateOfBirth());
+        if (date == null) {
+            return new Result(false, "Поставьте правильную дату");
+        }
         groupEntity.ifPresent(entity -> studentRepository.save(new StudentEntity(
                 student.getFirstname(),
                 student.getLastname(),
                 student.getPatronymic(),
-                convertDate(student.getDateOfBirth()),
+                date,
                 student.getGender(),
                 student.getHasChildren(),
                 student.getScholarship(),
                 entity
         )));
+        return new Result(true, "Студент успешно добавлен");
+    }
+
+    @PostMapping("/api/student/delete")
+    @Transactional
+    public Result deleteStudent(@RequestParam Long id) {
+        try {
+            markRepository.deleteByStudentId(id);
+            graduateWorkRepository.deleteByStudentId(id);
+            studentRepository.deleteById(id);
+        } catch (Exception e) {
+            return new Result(false, "Нельзя удалить студента пока не удалены все ссылки на него");
+        }
+        return new Result(true, "Студент успешно удален");
     }
 }

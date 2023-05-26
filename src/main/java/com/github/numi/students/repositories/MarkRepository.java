@@ -5,6 +5,7 @@ import com.github.numi.students.entities.GroupEntity;
 import com.github.numi.students.entities.MarkEntity;
 import com.github.numi.teachers.entities.LessonEntity;
 import com.github.numi.teachers.entities.TeacherEntity;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -51,4 +52,8 @@ public interface MarkRepository extends CrudRepository<MarkEntity, Long> {
                               @Param("teacher") TeacherEntity teacher,
                               @Param("start") LocalDate start,
                               @Param("end") LocalDate end);
+
+    @Modifying
+    @Query("DELETE FROM MarkEntity m WHERE :id = m.student.id")
+    void deleteByStudentId(@Param("id") Long studentId);
 }
