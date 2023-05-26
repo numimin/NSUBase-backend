@@ -654,20 +654,22 @@ public class NSUBaseApplication {
         return new Result(true, "Преподаватель успешно добавлен");
     }
 
-    /*@PostMapping("/api/student/delete")
+    @PostMapping("/api/teacher/delete")
     @Transactional
-    public Result deleteStudent(@RequestParam Long id) {
+    public Result deleteTeacher(@RequestParam Long id) {
         try {
-            markRepository.deleteByStudentId(id);
-            graduateWorkRepository.deleteByStudentId(id);
-            studentRepository.deleteById(id);
+            markRepository.deleteByTeacherId(id);
+            lessonRepository.deleteByTeacherId(id);
+            graduateWorkRepository.deleteByTeacherId(id);
+            teacherRepository.deleteById(id);
         } catch (Exception e) {
-            return new Result(false, "Нельзя удалить студента пока не удалены все ссылки на него");
+            e.printStackTrace();
+            return new Result(false, "Нельзя удалить преподавателя пока не удалены все ссылки на него");
         }
-        return new Result(true, "Студент успешно удален");
+        return new Result(true, "Преподаватель успешно удален");
     }
 
-    @PostMapping("/api/student/update")
+    /*@PostMapping("/api/student/update")
     @Transactional
     public Result updateStudent(@RequestParam Long id, @RequestBody AddStudentBody student) {
         Optional<GroupEntity> groupEntity = groupRepository.findById(student.getGroupId());

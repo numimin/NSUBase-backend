@@ -7,6 +7,7 @@ import com.github.numi.teachers.entities.LessonEntity;
 import com.github.numi.teachers.entities.TeacherEntity;
 import com.github.numi.teachers.json.Load;
 import com.github.numi.teachers.json.Type;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -51,4 +52,8 @@ public interface LessonRepository extends CrudRepository<LessonEntity, Long> {
 
     Set<Type> findTypes(@Param("teacher") TeacherEntity teacher,
                         @Param("department") DepartmentEntity department);
+
+    @Modifying
+    @Query("DELETE FROM LessonEntity l WHERE :id = l.teacher.id")
+    void deleteByTeacherId(@Param("id") Long id);
 }
