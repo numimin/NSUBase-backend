@@ -809,4 +809,56 @@ public class NSUBaseApplication {
 
         return new Result(true, "Факультет успешно изменен");
     }
+
+    @PostMapping("/api/department/add")
+    public Result addDepartment(@RequestBody AddDepartmentBody department) {
+        Optional<FacultyEntity> facultyEntity = facultyRepository.findById(department.getFacultyId());
+        try {
+            facultyEntity.ifPresent(entity -> departmentRepository.save(new DepartmentEntity(
+                    department.getName(),
+                    entity
+            )));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Кафедра не была добавлена");
+        }
+
+        return new Result(true, "Кафедра успешно добавлена");
+    }
+
+    @PostMapping("/api/department/delete")
+    @Transactional
+    public Result deleteDepartment(@RequestParam Long id) {
+        try {
+            markRepository.deleteByDepartmentId(id);
+            graduateWorkRepository.deleteByDepartmentId(id);
+            lessonRepository.deleteByDepartmentId(id);
+            teacherRepository.deleteByDepartmentId(id);
+            departmentRepository.deleteById(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Нельзя удалить кафедру пока не удалены все ссылки на нее");
+        }
+        return new Result(true, "Кафедра успешно удалена");
+    }
+
+    @PostMapping("/api/department/update")
+    public Result updateDepartment(@RequestParam Long id, @RequestBody AddDepartmentBody department) {
+        Optional<FacultyEntity> facultyEntity = facultyRepository.findById(department.getFacultyId());
+        try {
+            facultyEntity.ifPresent(entity -> {
+                var departmentEntity = new DepartmentEntity(
+                        department.getName(),
+                        entity
+                );
+                departmentEntity.setId(id);
+                departmentRepository.save(departmentEntity);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Кафедра не была изменена");
+        }
+
+        return new Result(true, "Кафедра успешно изменена");
+    }
 }

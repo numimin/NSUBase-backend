@@ -64,4 +64,8 @@ public interface LessonRepository extends CrudRepository<LessonEntity, Long> {
     @Modifying
     @Query("DELETE FROM LessonEntity l WHERE :id IN (SELECT l.group.faculty.id FROM LessonEntity l WHERE :id = l.group.faculty.id)")
     void deleteByFacultyId(@Param("id") Long id);
+
+    @Modifying
+    @Query("DELETE FROM LessonEntity l WHERE :id IN (SELECT l.teacher.department.id FROM LessonEntity l WHERE :id = l.teacher.department.id)")
+    void deleteByDepartmentId(Long id);
 }
