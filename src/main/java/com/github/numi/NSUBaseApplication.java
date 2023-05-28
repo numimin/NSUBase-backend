@@ -763,4 +763,50 @@ public class NSUBaseApplication {
 
         return new Result(true, "Группа успешно изменена");
     }
+
+    @PostMapping("/api/faculty/add")
+    public Result addFaculty(@RequestBody AddFacultyBody faculty) {
+        try {
+            facultyRepository.save(new FacultyEntity(faculty.getName()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Факультет не был добавлен");
+        }
+
+        return new Result(true, "Факультет успешно добавлен");
+    }
+
+    @PostMapping("/api/faculty/delete")
+    @Transactional
+    public Result deleteFaculty(@RequestParam Long id) {
+        try {
+            markRepository.deleteByFacultyId(id);
+            graduateWorkRepository.deleteByFacultyId(id);
+            studentRepository.deleteByFacultyId(id);
+            lessonRepository.deleteByFacultyId(id);
+            groupRepository.deleteByFacultyId(id);
+
+            teacherRepository.deleteByFacultyId(id);
+            departmentRepository.deleteByFacultyId(id);
+            facultyRepository.deleteById(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Нельзя удалить фвкультет пока не удалены все ссылки на нее");
+        }
+        return new Result(true, "Факультет успешно удален");
+    }
+
+    @PostMapping("/api/faculty/update")
+    public Result updateFaculty(@RequestParam Long id, @RequestBody AddFacultyBody faculty) {
+        try {
+            var entity = new FacultyEntity(faculty.getName());
+            entity.setId(id);
+            facultyRepository.save(entity);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Факультет не был изменен");
+        }
+
+        return new Result(true, "Факультет успешно изменен");
+    }
 }

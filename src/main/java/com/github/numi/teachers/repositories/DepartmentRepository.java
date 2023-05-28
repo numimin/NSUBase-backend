@@ -3,6 +3,7 @@ package com.github.numi.teachers.repositories;
 import com.github.numi.students.entities.FacultyEntity;
 import com.github.numi.students.entities.GroupEntity;
 import com.github.numi.teachers.entities.DepartmentEntity;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -14,4 +15,8 @@ public interface DepartmentRepository extends CrudRepository<DepartmentEntity, L
     List<DepartmentEntity> findDepartments(@Param("faculty") FacultyEntity faculty);
     @Query("SELECT d FROM DepartmentEntity d")
     List<DepartmentEntity> findDepartments();
+
+    @Modifying
+    @Query("DELETE FROM DepartmentEntity d WHERE :id = d.faculty.id")
+    void deleteByFacultyId(@Param("id") Long id);
 }

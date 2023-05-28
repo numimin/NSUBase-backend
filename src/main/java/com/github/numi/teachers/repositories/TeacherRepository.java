@@ -5,6 +5,7 @@ import com.github.numi.students.enums.Gender;
 import com.github.numi.teachers.entities.DepartmentEntity;
 import com.github.numi.teachers.entities.TeacherEntity;
 import com.github.numi.teachers.enums.Category;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -42,4 +43,8 @@ public interface TeacherRepository extends CrudRepository<TeacherEntity, Long> {
             "(:faculty IS NULL OR :faculty = t.department.faculty)")
     Set<TeacherEntity> findTeachersByAffinity(@Param("department") DepartmentEntity department,
                                               @Param("faculty")FacultyEntity faculty);
+
+    @Modifying
+    @Query("DELETE FROM TeacherEntity t WHERE :id IN (SELECT t.department.faculty.id FROM TeacherEntity t WHERE t.department.faculty.id = :id)")
+    void deleteByFacultyId(@Param("id") Long id);
 }

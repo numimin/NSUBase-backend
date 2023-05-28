@@ -41,4 +41,8 @@ public interface GraduateWorkRepository extends CrudRepository<GraduateWorkEntit
     @Modifying
     @Query("DELETE FROM GraduateWorkEntity w WHERE :id IN (SELECT w.student.group.id FROM GraduateWorkEntity w WHERE w.student.group.id = :id)")
     void deleteByGroupId(@Param("id") Long id);
+
+    @Modifying
+    @Query("DELETE FROM GraduateWorkEntity w WHERE :id IN (SELECT w.student.group.faculty.id FROM GraduateWorkEntity w WHERE w.student.group.faculty.id = :id)")
+    void deleteByFacultyId(@Param("id") Long id);
 }
