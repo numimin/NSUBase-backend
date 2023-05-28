@@ -727,6 +727,8 @@ public class NSUBaseApplication {
     @Transactional
     public Result deleteGroup(@RequestParam Long id) {
         try {
+            markRepository.deleteByGroupId(id);
+            graduateWorkRepository.deleteByGroupId(id);
             studentRepository.deleteByGroupId(id);
             lessonRepository.deleteByGroupId(id);
             groupRepository.deleteById(id);
@@ -735,5 +737,30 @@ public class NSUBaseApplication {
             return new Result(false, "Нельзя удалить группу пока не удалены все ссылки на нее");
         }
         return new Result(true, "Группа успешно удалена");
+    }
+
+    @PostMapping("/api/group/update")
+    public Result updateGroup(@RequestParam Long id, @RequestBody AddGroupBody group) {
+        Optional<FacultyEntity> facultyEntity = facultyRepository.findById(group.getFacultyId());
+        var date = convertDate(group.getDate());
+        if (date == null) {
+            return new Result(false, "Поставьте правильную дату");
+        }
+        try {
+            facultyEntity.ifPresent(entity -> {
+                var newEntity = new GroupEntity(
+                        group.getName(),
+                        date,
+                        entity
+                );
+                newEntity.setId(id);
+                groupRepository.save(newEntity);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Группа не была изменена");
+        }
+
+        return new Result(true, "Группа успешно изменена");
     }
 }

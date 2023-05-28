@@ -60,4 +60,8 @@ public interface MarkRepository extends CrudRepository<MarkEntity, Long> {
     @Modifying
     @Query("DELETE FROM MarkEntity m WHERE :id IN (SELECT m.lesson.teacher.id FROM MarkEntity m WHERE m.lesson.teacher.id = :id)")
     void deleteByTeacherId(@Param("id") Long id);
+
+    @Modifying
+    @Query("DELETE FROM MarkEntity m WHERE :id IN (SELECT m.student.group.id FROM MarkEntity m WHERE m.student.group.id = :id)")
+    void deleteByGroupId(@Param("id") Long id);
 }

@@ -65,4 +65,8 @@ public class GroupEntity {
     public void setEnd_(LocalDate end) {
         this.end_ = end;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
