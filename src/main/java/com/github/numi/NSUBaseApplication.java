@@ -72,6 +72,56 @@ public class NSUBaseApplication {
         this.markRepository = markRepository;
         this.graduateWorkRepository = graduateWorkRepository;
 
+        /*FacultyEntity fit = new FacultyEntity("ФИЗФАК");
+        facultyRepository.save(fit);
+        GroupEntity group20201 = new GroupEntity("20203", LocalDate.of(2020, 8, 31), fit);
+        groupRepository.save(group20201);
+        GroupEntity group20202 = new GroupEntity("20204", LocalDate.of(2020, 8, 31), fit);
+        groupRepository.save(group20202);
+
+        DepartmentEntity si = new DepartmentEntity("Экспериментальная физика", fit);
+        departmentRepository.save(si);
+        DepartmentEntity kt = new DepartmentEntity("Теоретическая физика", fit);
+        departmentRepository.save(kt);
+
+        Random rand = new Random();
+        var firstnames = Arrays.asList("Юрий", "Егор", "Дмитрий", "Иван", "Роман");
+        var lastnames = Arrays.asList("Колюжнов", "Парфенов", "Пальчунов", "Иванов", "Дмитриевский");
+        var patronymics = Arrays.asList("Юрьевич", "Егорович", "Дмитриевич", "Иванович", "Романович");
+        for (var firstname : firstnames) {
+            for (var lastname: lastnames) {
+                for (var patronymic : patronymics) {
+                    studentRepository.save(new StudentEntity(
+                            firstname, lastname, patronymic,
+                            LocalDate.of(2002, rand.nextInt(12) + 1, rand.nextInt(28) + 1),
+                            rand.nextInt(2) == 0 ? Gender.FEMALE : Gender.MALE,
+                            rand.nextInt(2) == 0,
+                            rand.nextInt(5000),
+                            rand.nextInt(2) == 0 ? group20201 : group20202
+                    ));
+                }
+            }
+        }
+
+        for (var firstname : firstnames) {
+            for (var lastname: lastnames) {
+                for (var patronymic : patronymics) {
+                    teacherRepository.save(new TeacherEntity(
+                            firstname, lastname, patronymic,
+                            rand.nextInt(3) == 0 ? Category.ASSISTANT : rand.nextInt(2) == 0 ? Category.ASSISTANT_PROFESSOR : Category.PROFESSOR,
+                            rand.nextInt(2) == 0 ? Gender.FEMALE : Gender.MALE,
+                            rand.nextInt(2) == 0,
+                            rand.nextInt(10000) + 15000,
+                            rand.nextInt(2) == 0,
+                            LocalDate.of(2013, rand.nextInt(12) + 1, rand.nextInt(28) + 1),
+                            rand.nextInt(2) == 0 ? kt : si,
+                            null,
+                            null
+                    ));
+                }
+            }
+        }*/
+
         /*FacultyEntity fen = new FacultyEntity("ФЕН");
         facultyRepository.save(fen);
         FacultyEntity fit = new FacultyEntity("ФИТ");
