@@ -518,7 +518,7 @@ public class NSUBaseApplication {
         }
 
         return graduateWorkRepository.findGraduateWorks(departmentEntity, teacherEntity)
-                .stream().map(w -> new StudentGraduateWork(w.getStudent(), w))
+                .stream().map(w -> new StudentGraduateWork(w.getStudent(), w, w.getId()))
                 .collect(Collectors.toSet());
     }
 
@@ -569,6 +569,7 @@ public class NSUBaseApplication {
     }
 
     @PostMapping("/api/student/add")
+    @Transactional
     public Result addStudent(@RequestBody AddStudentBody student) {
         Optional<GroupEntity> groupEntity = groupRepository.findById(student.getGroupId());
         var date = convertDate(student.getDateOfBirth());
@@ -627,6 +628,7 @@ public class NSUBaseApplication {
     }
 
     @PostMapping("/api/teacher/add")
+    @Transactional
     public Result addTeacher(@RequestBody AddTeacherBody teacher) {
         Optional<DepartmentEntity> departmentEntity = departmentRepository.findById(teacher.getDepartmentId());
         LocalDate date = null;
@@ -703,6 +705,7 @@ public class NSUBaseApplication {
     }
 
     @PostMapping("/api/group/add")
+    @Transactional
     public Result addGroup(@RequestBody AddGroupBody group) {
         Optional<FacultyEntity> facultyEntity = facultyRepository.findById(group.getFacultyId());
         var date = convertDate(group.getDate());
@@ -765,6 +768,7 @@ public class NSUBaseApplication {
     }
 
     @PostMapping("/api/faculty/add")
+    @Transactional
     public Result addFaculty(@RequestBody AddFacultyBody faculty) {
         try {
             facultyRepository.save(new FacultyEntity(faculty.getName()));
@@ -811,6 +815,7 @@ public class NSUBaseApplication {
     }
 
     @PostMapping("/api/department/add")
+    @Transactional
     public Result addDepartment(@RequestBody AddDepartmentBody department) {
         Optional<FacultyEntity> facultyEntity = facultyRepository.findById(department.getFacultyId());
         try {
@@ -860,5 +865,60 @@ public class NSUBaseApplication {
         }
 
         return new Result(true, "Кафедра успешно изменена");
+    }
+
+    @PostMapping("/api/work/add")
+    @Transactional
+    public Result addWork(@RequestBody AddWorkBody graduateWork) {
+        Optional<TeacherEntity> teacherEntity = teacherRepository.findById(graduateWork.getTeacherId());
+        Optional<StudentEntity> studentEntity = studentRepository.findById(graduateWork.getStudentId());
+        try {
+            teacherEntity.ifPresent(teacher -> studentEntity.ifPresent(student -> {
+                graduateWorkRepository.save(new GraduateWorkEntity(
+                        graduateWork.getTheme(),
+                        student,
+                        teacher
+                ));
+            }));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Работа не была добавлена");
+        }
+
+        return new Result(true, "Работа успешно добавлена");
+    }
+
+    @PostMapping("/api/work/delete")
+    @Transactional
+    public Result deleteWork(@RequestParam Long id) {
+        try {
+            graduateWorkRepository.deleteById(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Нельзя удалить работу пока не удалены все ссылки на нее");
+        }
+        return new Result(true, "Работа успешно удалена");
+    }
+
+    @PostMapping("/api/work/update")
+    public Result updateWork(@RequestParam Long id, @RequestBody AddWorkBody graduateWork) {
+        Optional<TeacherEntity> teacherEntity = teacherRepository.findById(graduateWork.getTeacherId());
+        Optional<StudentEntity> studentEntity = studentRepository.findById(graduateWork.getStudentId());
+        try {
+            teacherEntity.ifPresent(teacher -> studentEntity.ifPresent(student -> {
+                var entity =  new GraduateWorkEntity(
+                        graduateWork.getTheme(),
+                        student,
+                        teacher
+                );
+                entity.setId(id);
+                graduateWorkRepository.save(entity);
+            }));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Работа не была изменена");
+        }
+
+        return new Result(true, "Работа успешно изменена");
     }
 }
