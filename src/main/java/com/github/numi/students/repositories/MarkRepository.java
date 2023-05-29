@@ -43,7 +43,7 @@ public interface MarkRepository extends CrudRepository<MarkEntity, Long> {
             "(:mark IS NULL OR :mark = m.mark) AND " +
             "(:lesson IS NULL OR :lesson = m.lesson) AND " +
             "(:teacher IS NULL OR :teacher = m.lesson.teacher) AND " +
-            "(:start IS NULL OR :end IS NULL OR m.date BETWEEN :start AND :end)"
+            "(CAST(:start AS date) IS NULL OR CAST(:end AS date) IS NULL OR m.date BETWEEN :start AND :end)"
     )
     Set<MarkEntity> findMarks(@Param("group")GroupEntity group,
                               @Param("term") Integer term,

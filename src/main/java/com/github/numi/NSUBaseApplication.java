@@ -214,7 +214,10 @@ public class NSUBaseApplication {
                                   @RequestParam(required = false) Integer maxScholarship,
                                   @RequestBody() StudentsQuery query) {
         final LocalDate end = age == null ? null : LocalDate.now().minusYears(age);
+        System.out.println(end);
         final LocalDate start = age == null ? null : end.minusYears(1);
+        System.out.println(start);
+        System.out.println(hasChildren);
 
         Set<StudentEntity> entities = retrieveAll(
                 query.getGroups() == null ? null : Arrays.stream(query.getGroups())
@@ -973,5 +976,88 @@ public class NSUBaseApplication {
         }
 
         return new Result(true, "Работа успешно изменена");
+    }
+
+    @PostMapping("/api/mark/add")
+    @Transactional
+    public Result addMark(@RequestBody AddMarkBody mark) {
+        Optional<LessonEntity> lessonEntity = lessonRepository.findById(mark.getLessonId());
+        Optional<StudentEntity> studentEntity = studentRepository.findById(mark.getStudentId());
+        var date = convertDate(mark.getDate());
+        if (date == null) {
+            return new Result(false, "Поставьте правильную дату");
+        }
+        try {
+            lessonEntity.ifPresent(lesson -> studentEntity.ifPresent(student -> {
+                markRepository.save(new MarkEntity(
+                        lesson,
+                        student,
+                        mark.getMark(),
+                        date
+                ));
+            }));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Оценка не была добавлена");
+        }
+
+        return new Result(true, "Оценка успешно добавлена");
+    }
+
+    @PostMapping("/api/mark/delete")
+    @Transactional
+    public Result deleteMark(@RequestParam Long id) {
+        try {
+            markRepository.deleteById(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Нельзя удалить оценку пока не удалены все ссылки на нее");
+        }
+        return new Result(true, "Оценка успешно удалена");
+    }
+
+    @PostMapping("/api/mark/update")
+    public Result updateMark(@RequestParam Long id, @RequestBody AddMarkBody mark) {
+        Optional<LessonEntity> lessonEntity = lessonRepository.findById(mark.getLessonId());
+        Optional<StudentEntity> studentEntity = studentRepository.findById(mark.getStudentId());
+        var date = convertDate(mark.getDate());
+        if (date == null) {
+            return new Result(false, "Поставьте правильную дату");
+        }
+        try {
+            lessonEntity.ifPresent(lesson -> studentEntity.ifPresent(student -> {
+                var entity = new MarkEntity(
+                        lesson,
+                        student,
+                        mark.getMark(),
+                        date
+                );
+                entity.setId(id);
+                markRepository.save(entity);
+            }));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Оценка не была изменена");
+        }
+
+        return new Result(true, "Оценка успешно изменена");
+    }
+
+    @GetMapping("/api/mark/all")
+    public ArrayList<MarkString> getMarks() {
+        ArrayList<MarkString> marks = new ArrayList<>();
+        markRepository.findAll().forEach(mark -> {
+            var date = new DateStruct(mark.getDate());
+            marks.add(new MarkString(
+                    mark.getId(),
+                    mark.getMark(),
+                    mark.getLesson().getName(),
+                    (mark.getStudent().getFirstname() + " " + mark.getStudent().getLastname() + " " + mark.getStudent().getPatronymic()),
+                    mark.getLesson().getId(),
+                    mark.getStudent().getId(),
+                    date
+            ));
+        });
+        return marks;
     }
 }

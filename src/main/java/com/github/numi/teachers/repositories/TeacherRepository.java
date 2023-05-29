@@ -23,8 +23,8 @@ public interface TeacherRepository extends CrudRepository<TeacherEntity, Long> {
            "(:minSalary IS NULL OR :minSalary <= t.salary) AND" +
            "(:maxSalary IS NULL OR :maxSalary >= t.salary) AND" +
            "(:graduateStudent IS NULL OR :graduateStudent = t.graduateStudent) AND" +
-           "(:phdThesisStartDate IS NULL OR :phdThesisStartDate <= t.phdThesisDate) AND" +
-           "(:phdThesisEndDate IS NULL OR :phdThesisEndDate >= t.phdThesisDate) AND" +
+           "(CAST(:phdThesisStartDate AS date) IS NULL OR :phdThesisStartDate <= t.phdThesisDate) AND" +
+           "(CAST(:phdThesisEndDate AS date) IS NULL OR :phdThesisEndDate >= t.phdThesisDate) AND" +
            "(:department IS NULL OR :department = t.department) AND" +
            "(:faculty IS NULL OR :faculty = t.department.faculty)"
     )

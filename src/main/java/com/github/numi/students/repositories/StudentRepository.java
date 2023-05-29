@@ -16,8 +16,8 @@ public interface StudentRepository extends CrudRepository<StudentEntity, Long> {
     @Query("SELECT s FROM StudentEntity s WHERE " +
             "(:gender IS NULL OR :gender = s.gender) AND " +
             "(:year IS NULL OR :year = YEAR(s.dateOfBirth)) AND " +
-            "(:end IS NULL OR (:end >= s.dateOfBirth AND :start <= s.dateOfBirth))" +
-            " AND (:hasChildren IS NULL OR :hasChildren = s.hasChildren) " +
+            "(CAST(:end AS date) IS NULL OR CAST(:start AS date) IS NULL OR (:end >= s.dateOfBirth AND :start <= s.dateOfBirth))" +
+            " AND (CAST(:hasChildren AS integer) IS NULL OR :hasChildren = s.hasChildren) " +
             "AND (:minScholarship IS NULL OR :minScholarship <= s.scholarship) " +
             "AND (:maxScholarship IS NULL OR s.scholarship <= :maxScholarship) " +
             "AND (:group IS NULL OR s.group = :group) AND " +
