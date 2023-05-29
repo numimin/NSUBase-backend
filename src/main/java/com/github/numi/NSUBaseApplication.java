@@ -1060,4 +1060,68 @@ public class NSUBaseApplication {
         });
         return marks;
     }
+
+    @PostMapping("/api/lesson/add")
+    @Transactional
+    public Result addLesson(@RequestBody AddLessonBody lesson) {
+        Optional<GroupEntity> groupEntity = groupRepository.findById(lesson.getGroupId());
+        Optional<TeacherEntity> teacherEntity = teacherRepository.findById(lesson.getTeacherId());
+        try {
+            groupEntity.ifPresent(group -> teacherEntity.ifPresent(teacher -> {
+                lessonRepository.save(new LessonEntity(
+                        lesson.getName(),
+                        teacher,
+                        group,
+                        lesson.getTerm(),
+                        lesson.getCourse(),
+                        lesson.getType(),
+                        lesson.getHours()
+                ));
+            }));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Предмет не был добавлен");
+        }
+
+        return new Result(true, "Предмет успешно добавлен");
+    }
+
+    @PostMapping("/api/lesson/delete")
+    @Transactional
+    public Result deleteLesson(@RequestParam Long id) {
+        try {
+            markRepository.deleteByLessonId(id);
+            lessonRepository.deleteById(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Нельзя удалить предмет пока не удалены все ссылки на нее");
+        }
+        return new Result(true, "Предмет успешно удален");
+    }
+
+    @PostMapping("/api/lesson/update")
+    public Result updateLesson(@RequestParam Long id, @RequestBody AddLessonBody lesson) {
+        Optional<GroupEntity> groupEntity = groupRepository.findById(lesson.getGroupId());
+        Optional<TeacherEntity> teacherEntity = teacherRepository.findById(lesson.getTeacherId());
+        try {
+            groupEntity.ifPresent(group -> teacherEntity.ifPresent(teacher -> {
+                var entity = new LessonEntity(
+                        lesson.getName(),
+                        teacher,
+                        group,
+                        lesson.getTerm(),
+                        lesson.getCourse(),
+                        lesson.getType(),
+                        lesson.getHours()
+                );
+                entity.setId(id);
+                lessonRepository.save(entity);
+            }));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "Предмет не был изменен");
+        }
+
+        return new Result(true, "Предмет успешно изменен");
+    }
 }
