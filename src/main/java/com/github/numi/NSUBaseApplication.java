@@ -28,6 +28,7 @@ import com.github.numi.utils.DateStruct;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -38,7 +39,8 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@SpringBootApplication(exclude = SecurityAutoConfiguration.class)
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
+@PropertySource("classpath:application.properties")
 @RestController
 public class NSUBaseApplication {
     private final StudentRepository studentRepository;
@@ -70,7 +72,7 @@ public class NSUBaseApplication {
         this.markRepository = markRepository;
         this.graduateWorkRepository = graduateWorkRepository;
 
-        FacultyEntity fen = new FacultyEntity("ФЕН");
+        /*FacultyEntity fen = new FacultyEntity("ФЕН");
         facultyRepository.save(fen);
         FacultyEntity fit = new FacultyEntity("ФИТ");
         facultyRepository.save(fit);
@@ -122,7 +124,7 @@ public class NSUBaseApplication {
 
         graduateWorkRepository.save(new GraduateWorkEntity(
                 "Теория Поля", sadriev, kugaevskikh
-        ));
+        ));*/
     }
 
     private static <T, U, R> Set<R> retrieveAll(List<Optional<T>> lhs, List<Optional<U>> rhs, BiFunction<T, U, Set<R>> function) {
@@ -162,6 +164,7 @@ public class NSUBaseApplication {
                                   @RequestParam(required = false) Integer maxScholarship,
                                   @RequestBody() StudentsQuery query) {
         final LocalDate end = age == null ? null : LocalDate.now().minusYears(age);
+        final LocalDate start = age == null ? null : end.minusYears(1);
 
         Set<StudentEntity> entities = retrieveAll(
                 query.getGroups() == null ? null : Arrays.stream(query.getGroups())
@@ -171,7 +174,7 @@ public class NSUBaseApplication {
                         .map(facultyRepository::findById)
                         .toList(),
                 (group, faculty) -> studentRepository.findStudent(
-                        gender, year, end, hasChildren,
+                        gender, year, start, end, hasChildren,
                         minScholarship, maxScholarship,
                         group, faculty));
 
@@ -430,13 +433,13 @@ public class NSUBaseApplication {
             }
         }
         final LessonEntity finalLessonEntity = lessonEntity;
-        return retrieveAll(query == null ? null : Arrays.stream(query.getGroupIds()).map(groupRepository::findById).toList(), null,
+        return new HashSet<>(retrieveAll(query == null ? null : Arrays.stream(query.getGroupIds()).map(groupRepository::findById).toList(), null,
                 (group, none) -> {
                     return markRepository.findMarks(null, finalLessonEntity, mark, null)
                             .stream().map(MarkEntity::getStudent)
                             .map(Student::new)
                             .collect(Collectors.toSet());
-                });
+                }));
     }
 
     @PostMapping("/api/students_of_course_with_marks")

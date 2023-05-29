@@ -16,7 +16,7 @@ public interface StudentRepository extends CrudRepository<StudentEntity, Long> {
     @Query("SELECT s FROM StudentEntity s WHERE " +
             "(:gender IS NULL OR :gender = s.gender) AND " +
             "(:year IS NULL OR :year = YEAR(s.dateOfBirth)) AND " +
-            "(:end IS NULL OR :end >= s.dateOfBirth)" +
+            "(:end IS NULL OR (:end >= s.dateOfBirth AND :start <= s.dateOfBirth))" +
             " AND (:hasChildren IS NULL OR :hasChildren = s.hasChildren) " +
             "AND (:minScholarship IS NULL OR :minScholarship <= s.scholarship) " +
             "AND (:maxScholarship IS NULL OR s.scholarship <= :maxScholarship) " +
@@ -24,6 +24,7 @@ public interface StudentRepository extends CrudRepository<StudentEntity, Long> {
             "(:faculty IS NULL OR s.group.faculty = :faculty)")
     Set<StudentEntity> findStudent(@Param("gender") Gender gender,
                                    @Param("year")Integer year,
+                                   @Param("start") LocalDate start,
                                    @Param("end") LocalDate end,
                                    @Param("hasChildren")Boolean hasChildren,
                                    @Param("minScholarship")Integer minScholarship,
